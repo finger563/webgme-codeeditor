@@ -7,12 +7,12 @@
 	    "Project": {
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
-		"Detailed Description": {"name":"markdown"},
+		"Detailed Description": {"name":"markdown"}
 	    },	
 	    "Package": {
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
-		"Detailed Description": {"name":"markdown"},
+		"Detailed Description": {"name":"markdown"}
 	    },
 	    "Message": {
 		"Definition": {
@@ -68,30 +68,29 @@
 		"User Artifacts": {"name":"application/json"},
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
-		"Detailed Description": {"name":"markdown"},
+		"Detailed Description": {"name":"markdown"}
 	    },
 	    "Timer": {
 		"Operation": {"name":"text/x-c++src", "useCPP":true},
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
 		"Detailed Description": {"name":"markdown"},
-		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true},
+		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true}
 	    },
 	    "Server": {
 		"Operation": {"name":"text/x-c++src", "useCPP":true},
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
 		"Detailed Description": {"name":"markdown"},
-		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true},
+		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true}
 	    },
 	    "Subscriber": {
 		"Operation": {"name":"text/x-c++src", "useCPP":true},
 		"Authors": {"name":"markdown"},
 		"Brief Description": {"name":"markdown"},
 		"Detailed Description": {"name":"markdown"},
-		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true},
+		"AbstractBusinessLogic": {"name":"text/x-c++src", "useCPP":true}
 	    }
 	}
     }
-}
 }
