@@ -2,7 +2,7 @@
     "CodeEditor": {
 	"theme": "default",
 	"keyBinding": "sublime",
-        "autoSaveInterval": 1000,
+        "autoSaveInterval": "2000",
 	"map": {
 	    "Project": {
 		"Authors": {"name":"markdown"},
