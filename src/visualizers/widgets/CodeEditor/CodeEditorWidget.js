@@ -156,8 +156,8 @@ define([
     CodeEditorWidget.getDefaultConfig = function () { 
         return {
 	    'theme': 'default',
-	    'keyBindings': 'sublime',
-	    'autoSaveInterval': 1.0,
+	    'keyBinding': 'sublime',
+	    'autoSaveInterval': 3000,
 	    'map': {}
 	};
     }; 
@@ -199,7 +199,7 @@ define([
 	    matchBrackets: true,
 	    lint: true,
 	    //viewPortMargin: Infinity,
-	    keyMap: this._config.keyBindings,
+	    keyMap: this._config.keyBinding,
 	    path: './lib/cm/lib/',
 	    theme: this._config.theme,
 	    fullscreen: false,
