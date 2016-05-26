@@ -146,7 +146,7 @@ define([
     };
 
     CodeEditorWidget.getName = function () {
-        return 'CodeEditorWidget';
+        return 'CodeEditor';
     };
 
     CodeEditorWidget.getVersion = function () {
@@ -157,12 +157,13 @@ define([
         return {
 	    'theme': 'default',
 	    'keyBindings': 'sublime',
-	    'autoSaveInterval': 1.0
+	    'autoSaveInterval': 1.0,
+	    'map': {}
 	};
     }; 
     
     CodeEditorWidget.getComponentId = function () { 
-        return 'CodeEditorWidget'; 
+        return 'CodeEditor'; 
     }; 
 
     CodeEditorWidget.prototype._initialize = function () {

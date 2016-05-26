@@ -16,95 +16,7 @@ define(['js/Constants',
     var CodeEditorControl;
 
     // the final leaf is a 'mode' object for the CodeMirror to use
-    var TypeToAttributeMap = {
-	'Project': {
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	},	
-	'Package': {
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	},
-	'Message': {
-	    'Definition': {
-		name:'text/x-c++src', 
-		keywords: {
-		    'int8': 'int8',
-		    'int16': 'int16',
-		    'int32': 'int32',
-		    'int64': 'int64',
-		    'uint8': 'uint8',
-		    'uint16': 'uint16',
-		    'uint32': 'uint32',
-		    'uint64': 'uint64',
-		    'bool': 'bool',
-		    'string': 'string',
-		    'float32': 'float32',
-		    'float64': 'float64',
-		    'time': 'time',
-		    'duration': 'duration'
-		},
-		useCPP:true
-	    }
-	},
-	'Service': {
-	    'Definition': {
-		name:'text/x-c++src', 
-		keywords: {
-		    'int8': 'int8',
-		    'int16': 'int16',
-		    'int32': 'int32',
-		    'int64': 'int64',
-		    'uint8': 'uint8',
-		    'uint16': 'uint16',
-		    'uint32': 'uint32',
-		    'uint64': 'uint64',
-		    'bool': 'bool',
-		    'string': 'string',
-		    'float32': 'float32',
-		    'float64': 'float64',
-		    'time': 'time',
-		    'duration': 'duration'
-		},
-		useCPP:true
-	    }
-	},
-	'Component': {
-	    'Forwards': {name:'text/x-c++src', useCPP:true},
-	    'Members': {name:'text/x-c++src', useCPP:true},
-	    'Definitions': {name:'text/x-c++src', useCPP:true},
-	    'Initialization': {name:'text/x-c++src', useCPP:true},
-	    'Destruction': {name:'text/x-c++src', useCPP:true},
-	    'User Configuration': {name:'application/json'},
-	    'User Artifacts': {name:'application/json'},
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	},
-	'Timer': {
-	    'Operation': {name:'text/x-c++src', useCPP:true},
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	    'AbstractBusinessLogic': {name:'text/x-c++src', useCPP:true},
-	},
-	'Server': {
-	    'Operation': {name:'text/x-c++src', useCPP:true},
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	    'AbstractBusinessLogic': {name:'text/x-c++src', useCPP:true},
-	},
-	'Subscriber': {
-	    'Operation': {name:'text/x-c++src', useCPP:true},
-	    'Authors': {name:'markdown'},
-	    'Brief Description': {name:'markdown'},
-	    'Detailed Description': {name:'markdown'},
-	    'AbstractBusinessLogic': {name:'text/x-c++src', useCPP:true},
-	},
-    };
+    var TypeToAttributeMap = {};
 
     CodeEditorControl = function (options) {
 
@@ -113,6 +25,10 @@ define(['js/Constants',
 
         // Initialize core collections and variables
         this._widget = options.widget;
+
+	// the component config comes from widget._config
+	this._config = this._widget._config;
+	TypeToAttributeMap = this._config.map;
 
         this.currentNodeInfo = {id: null, children: [], parentId: null};
 	this._topNode = '/v';
@@ -199,7 +115,7 @@ define(['js/Constants',
 	    var baseObj = client.getNode(baseId);
 	    if (baseObj) {
 		var nodeMetaName = baseObj.getAttribute('name');
-		if (nodeMetaName && TypeToAttributeMap[nodeMetaName]) {p
+		if (nodeMetaName && TypeToAttributeMap[nodeMetaName]) {
 		    var attrNames = Object.keys(TypeToAttributeMap[nodeMetaName]);
 		    attrNames.map(function(attrName) {
 			var value = nodeObj.getAttribute(attrName); 
