@@ -157,7 +157,7 @@ define([
         return {
 	    'theme': 'default',
 	    'keyBinding': 'sublime',
-	    'autoSaveInterval': 3000,
+	    'autoSaveInterval': 8000,
 	    'map': {}
 	};
     }; 
@@ -212,8 +212,8 @@ define([
 	);
 
 	this.editor.on(
-	    'changes', 
-	    _.debounce(this.saveChanges.bind(this), this._config.autoSaveInterval)
+	    'change',
+	    _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval)
 	);
 
 	var self=this;
