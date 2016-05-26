@@ -15,6 +15,8 @@ WebGME CodeEditor is a visualizer providing a simple interface to handle multi-l
 ## Quick start
 First, install codeeditor to your webgme app.
 ```
-webgme add viz CodeEditor webgme-codeeditor
+webgme add viz CodeEditor fing563/webgme-codeeditor
 ```
-Next, add it to your current layout! An example can be found in [rosmod](https://github.com/rosmod/webgme-rosmod)
+Next, add it to your current layout and update your config/components.json! An example can be found in [rosmod](https://github.com/rosmod/webgme-rosmod)
+
+An example configuration for components.json can be found in this repository at [components.json](./config/components.json).
