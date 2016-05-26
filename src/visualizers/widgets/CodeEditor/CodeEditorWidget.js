@@ -239,7 +239,7 @@ define([
 
 	// KEY MAP SELECTION
 	this.kb_select = this._el.find("#kb_select").first();
-	$(this.kb_select).val(this._config.keyBindings);
+	$(this.kb_select).val(this._config.keyBinding);
 	this.kb_select.on('change', this.selectKeyBinding.bind(this));
 
 	this.buffer_select = this._el.find("#buffer_select").first();
@@ -335,7 +335,7 @@ define([
 	var self=this;
 	var kb_select = event.target;
 	var binding = kb_select.options[kb_select.selectedIndex].textContent;
-	this._config.keyBindings = binding;
+	this._config.keyBinding = binding;
 	this.saveConfig();
 	this.editor.setOption("keyMap", binding);
     };
