@@ -1,7 +1,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](./LICENSE)
 
 # Webgme CodeEditor
-WebGME CodeEditor is a visualizer providing a simple interface to handle multi-line strings using [CodeMirror](codemirror.net) providing capabilities for:
+WebGME CodeEditor is a visualizer providing a simple interface to handle multi-line strings using [CodeMirror](http://codemirror.net) providing capabilities for:
 
 * Syntax highlighting
 * Code completion
