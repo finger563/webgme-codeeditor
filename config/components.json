@@ -1,0 +1,13 @@
+{
+    "CodeEditor": {
+	"theme": "default",
+	"keyBinding": "sublime",
+        "autoSaveInterval": 1.0,
+	"map": {
+	    "Project": {
+		"Authors" : {
+		}
+	    }
+	}
+    }
+}

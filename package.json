@@ -1,0 +1,17 @@
+{
+  "name": "webgme-codeeditor",
+  "scripts": {
+    "start": "node app.js",
+    "test": "node ./node_modules/mocha/bin/mocha --recursive test"
+  },
+  "version": "1.1.0",
+  "peerDependencies": {
+    "webgme": "^2.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.0.0",
+    "mocha": "^2.2.5",
+    "requirejs": "^2.2.0",
+    "rimraf": "^2.4.0"
+  }
+}
