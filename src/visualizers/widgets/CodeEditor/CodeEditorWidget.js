@@ -408,6 +408,9 @@ define([
     CodeEditorWidget.prototype.destroy = function () {
     };
 
+    CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
+    };
+
     CodeEditorWidget.prototype.onActivate = function () {
         //console.log('CodeEditorWidget has been activated');
     };
