@@ -159,7 +159,7 @@ define([
         return {
 	    'theme': 'default',
 	    'keyBinding': 'sublime',
-	    'autoSaveInterval': 8000,
+	    'autoSaveInterval': 2000,
 	    'map': {}
 	};
     }; 
@@ -293,7 +293,10 @@ define([
 
     CodeEditorWidget.prototype.saveChanges = function(cm, changes) {
 	try {
-	    this._client.setAttributes(this.selectedNode, this.selectedAttribute, cm.getValue());
+	    if (this.selectedNode && this.selectedAttribute) {
+		console.log('Saving Changes.');
+		this._client.setAttributes(this.selectedNode, this.selectedAttribute, cm.getValue());
+	    }
 	}
 	catch (e) {
 	    this._logger.error('Saving META failed!');
@@ -343,7 +346,8 @@ define([
     };
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
-        console.log('Widget is resizing...');
+	this.saveChanges();
+        //console.log('Widget is resizing...');
     };
 
     // Adding/Removing/Updating items
@@ -402,15 +406,20 @@ define([
     /* * * * * * * * Visualizer event handlers * * * * * * * */
 
     CodeEditorWidget.prototype.onNodeClick = function (id) {
-        // This currently changes the active node to the given id and
-        // this is overridden in the controller.
+        //console.log('node clicked');
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
+        //console.log('destroyed');
     };
 
     CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
+        //console.log('changed');
+    };
+
+    CodeEditorWidget.prototype.onUIActivity = function() {
+        //console.log('UI');
     };
 
     CodeEditorWidget.prototype.onActivate = function () {

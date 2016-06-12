@@ -2,7 +2,7 @@
     "CodeEditor": {
 	"theme": "default",
 	"keyBinding": "sublime",
-        "autoSaveInterval": "500",
+        "autoSaveInterval": "2000",
 	"map": {
 	    "CodeObject": {
 		"Markdown": {"name":"markdown"},
