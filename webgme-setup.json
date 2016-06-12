@@ -8,19 +8,9 @@
         "secondary": false,
         "widget": "src/visualizers/widgets/CodeEditor"
       }
-    },
-    "decorators": {},
-    "seeds": {},
-    "addons": {},
-    "layouts": {},
-    "plugins": {}
+    }
   },
   "dependencies": {
-    "visualizers": {},
-    "decorators": {},
-    "seeds": {},
-    "addons": {},
-    "layouts": {},
-    "plugins": {}
+    "visualizers": {}
   }
 }

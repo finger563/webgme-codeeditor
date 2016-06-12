@@ -15,6 +15,7 @@ define([
     './lib/cm/mode/clike/clike',
     './lib/cm/mode/markdown/markdown',
     './lib/cm/mode/javascript/javascript',
+    './lib/cm/mode/python/python',
     // Keymaps
     './lib/cm/keymap/emacs', 
     './lib/cm/keymap/sublime',
@@ -101,6 +102,7 @@ define([
     CodeMirrorModeClike,
     CodeMirrorModeMarkdown,
     CodeMirrorJavascript,
+    CodeMirrorPython,
     // Keymaps
     CodeMirrorEmacsKeymap,
     CodeMirrorSublimeKeymap,

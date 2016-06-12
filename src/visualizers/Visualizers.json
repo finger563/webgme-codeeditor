@@ -1,23 +1,5 @@
 [
   {
-    "id": "METAAspect",
-    "title": "Meta",
-    "panel": "js/Panels/MetaEditor/MetaEditorPanel",
-    "DEBUG_ONLY": false
-  },
-  {
-    "id": "ModelEditor",
-    "title": "Model",
-    "panel": "js/Panels/ModelEditor/ModelEditorPanel",
-    "DEBUG_ONLY": false
-  },
-  {
-    "id": "SetEditor",
-    "title": "SetEditor",
-    "panel": "js/Panels/SetEditor/SetEditorPanel",
-    "DEBUG_ONLY": false
-  },
-  {
     "id": "CodeEditor",
     "title": "CodeEditor",
     "panel": "panels/CodeEditor/CodeEditorPanel",

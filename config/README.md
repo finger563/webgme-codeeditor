@@ -1,5 +1,8 @@
-# Configuration
+# WebGME Configuration Settings
+On `npm start`, the webgme app will load `config.default.js` which will override the configuration [defaults](https://github.com/webgme/webgme/tree/master/config).
 
-Current config options:
-- *autoSaveInterval*: _float_. Default is `1.0`.  Sets the minimum time for an autosave interval.  Auto-save only happens when an attribute is being edited.
-- *map*: _object_. The map is an object whose keys are _meta object names_.  Each key points to an object whose keys are the _attribute names_ which should be editable using the CodeEditor visualizer.
+If `NODE_ENV` is set, it will first try to load the configuration settings from `config/config.ENV.js` where `ENV` is the value of `NODE_ENV`. For example,
+```
+NODE_ENV=debug npm start
+```
+will load the configuration settings from `config/config.debug.js` if it exists and fallback to `config/config.default.js` otherwise
