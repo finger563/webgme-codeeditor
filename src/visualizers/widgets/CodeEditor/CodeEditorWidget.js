@@ -197,6 +197,7 @@ define([
     CodeMirrorShowHint,
     CodeMirrorAnywordHint,
     CodeMirrorCSSHint,
+    CodeMirrorHTMLHint,
     CodeMirrorJSHint,
     CodeMirrorSQLHint,
     CodeMirrorXMLHint,
