@@ -246,6 +246,8 @@ define([
         return {
 	    'theme': 'default',
 	    'keyBinding': 'sublime',
+	    'defaultSyntax': 'cpp',
+	    'syntaxToModeMap': {},
 	    'autoSaveInterval': 2000,
 	    'map': {}
 	};
@@ -331,6 +333,16 @@ define([
 	$(this.kb_select).val(this._config.keyBinding);
 	this.kb_select.on('change', this.selectKeyBinding.bind(this));
 
+	// SYNTAX HIGHLIGHTING SELECTION
+	this.syntax_select = this._el.find("#syntax_select").first();
+	var modeNames = Object.keys(this._config.syntaxToModeMap);
+	var self = this;
+	modeNames.map(function(modeName) {
+	    $(self.syntax_select).append(new Option(modeName, modeName));
+	});
+	$(this.syntax_select).val(this._config.defaultSyntax);
+	this.syntax_select.on('change', this.selectSyntax.bind(this));
+
 	this.buffer_select = this._el.find("#buffer_select").first();
 	this.buffer_select.on('change', this.selectBuffer.bind(this));
 
@@ -414,6 +426,15 @@ define([
 	    });
     };
 
+    CodeEditorWidget.prototype.selectSyntax = function(event) {
+	var self=this;
+	var syntax_select = event.target;
+	var syntax = syntax_select.options[syntax_select.selectedIndex].textContent;
+	this._config.defaultSyntax = syntax;
+	this.saveConfig();
+	this.editor.setOption("mode", this._config.syntaxToModeMap[syntax]);
+    };
+
     CodeEditorWidget.prototype.selectTheme = function(event) {
 	var self=this;
 	var theme_select = event.target;
@@ -448,8 +469,13 @@ define([
 		self.selectedNode = desc.id;
 		attributeNames.map(function(attributeName) {
 		    // add the attributes to buffers
-		    self.docs[attributeName] = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, 
+		    var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
+			self._config.syntaxToModeMap[self._config.defaultSyntax];
+		    self.docs[attributeName] = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
+								  /*
+								  syntaxToModeMap[self._config.syntax]);
 								  desc.codeAttributes[attributeName].mode);
+								  */
 		    $(self.buffer_select).append(new Option(attributeName, attributeName));
 		});
 		// select the first attribute?

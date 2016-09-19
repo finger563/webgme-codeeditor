@@ -3,12 +3,19 @@
 	"theme": "default",
 	"keyBinding": "sublime",
         "autoSaveInterval": "2000",
-	"map": {
+	"defaultSyntax": "gfm",
+	"syntaxToModeMap": {
+	    "gfm": {"name":"gfm"},
+	    "C++": {"name":"text/x-c++src", "useCPP": true},
+	    "JSON": {"name":"application/json"},
+	    "Python": {"name":"text/x-python"}
+	},
+	"attrToSyntaxMap": {
 	    "CodeObject": {
-		"Markdown": {"name":"markdown"},
-		"C++": {"name":"text/x-c++src", "useCPP": true},
-		"JSON": {"name":"application/json"},
-		"Python": {"name":"text/x-python"}
+		"Markdown": "gfm",
+		"C++": "C++",
+		"JSON": "JSON",
+		"Python": "Python"
 	    }
 	}
     }

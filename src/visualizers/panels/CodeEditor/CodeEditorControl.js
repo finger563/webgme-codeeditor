@@ -28,7 +28,7 @@ define(['js/Constants',
 
 	// the component config comes from widget._config
 	this._config = this._widget._config;
-	TypeToAttributeMap = this._config.map;
+	TypeToAttributeMap = this._config.attrToSyntaxMap;
 
         this.currentNodeInfo = {id: null, children: [], parentId: null};
 	this._topNode = '/v';
