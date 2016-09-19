@@ -249,7 +249,7 @@ define([
 	    'defaultSyntax': 'cpp',
 	    'syntaxToModeMap': {},
 	    'autoSaveInterval': 2000,
-	    'map': {}
+	    'attrToSyntaxMap': {}
 	};
     }; 
     
