@@ -275,8 +275,8 @@ define([
 	this._container = this._el.find('#CODE_EDITOR_DIV').first();
 	this._codearea = this._el.find('#codearea').first();
 	this._title = this._el.find('#code_editor_title');
-	this.selectedAttribute = '';
-	this.selectedNode = '';
+	this.selectedAttribute = null;
+	this.selectedNode = null;
 
 	var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
 	CodeMirror.keyMap.default[(mac ? "Cmd" : "Ctrl") + "-Space"] = "autocomplete";
@@ -392,13 +392,16 @@ define([
 
     CodeEditorWidget.prototype.saveChanges = function(cm, changes) {
 	try {
-	    if (this.selectedNode && this.selectedAttribute) {
-		console.log('Saving Changes.');
-		this._client.setAttributes(this.selectedNode, this.selectedAttribute, cm.getValue());
+	    if (this.selectedNode && this.selectedAttribute && cm) {
+		var value = cm.getValue();
+		if (value != this.docs[this.selectedAttribute].__previous_value) {
+		    console.log('Saving Changes.');
+		    this._client.setAttributes(this.selectedNode, this.selectedAttribute, cm.getValue());
+		}
 	    }
 	}
 	catch (e) {
-	    this._logger.error('Saving META failed!');
+	    this._logger.error('Saving META failed: ' + e);
 	}
     };
 
@@ -454,7 +457,6 @@ define([
     };
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
-	this.saveChanges();
         //console.log('Widget is resizing...');
     };
 
@@ -472,10 +474,7 @@ define([
 		    var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
 			self._config.syntaxToModeMap[self._config.defaultSyntax];
 		    self.docs[attributeName] = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
-								  /*
-								  syntaxToModeMap[self._config.syntax]);
-								  desc.codeAttributes[attributeName].mode);
-								  */
+		    self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
 		    $(self.buffer_select).append(new Option(attributeName, attributeName));
 		});
 		// select the first attribute?
@@ -502,14 +501,17 @@ define([
 	    if (attributeNames.length > 0) {
 		self.nodes[desc.id] = desc;
 		attributeNames.map(function(attributeName) {
-		    var cursor = self.docs[attributeName].getCursor();
-		    var lineCount = self.docs[attributeName].lineCount();
-		    self.docs[attributeName].replaceRange(
-			desc.codeAttributes[attributeName].value,
-			{line:0, ch: 0},
-			{line:lineCount}
-		    );
-		    self.docs[attributeName].setCursor(cursor);
+		    if (self.docs[attributeName].__previous_value != desc.codeAttributes[attributeName].value) {
+			self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
+			var cursor = self.docs[attributeName].getCursor();
+			var lineCount = self.docs[attributeName].lineCount();
+			self.docs[attributeName].replaceRange(
+			    desc.codeAttributes[attributeName].value,
+			    {line:0, ch: 0},
+			    {line:lineCount}
+			);
+			self.docs[attributeName].setCursor(cursor);
+		    }
 		});
 		self.editor.refresh();
 	    }
@@ -524,7 +526,8 @@ define([
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
-        //console.log('destroyed');
+        console.log('CodeEditorWidget:: saving when being destroyed');
+	this.saveChanges();
     };
 
     CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
@@ -540,7 +543,8 @@ define([
     };
 
     CodeEditorWidget.prototype.onDeactivate = function () {
-        //console.log('CodeEditorWidget has been deactivated');
+        console.log('CodeEditorWidget:: saving when being deactivated');
+	this.saveChanges();
     };
 
     return CodeEditorWidget;
