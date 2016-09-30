@@ -500,6 +500,7 @@ define([
 	    var attributeNames = Object.keys(desc.codeAttributes);
 	    if (attributeNames.length > 0) {
 		self.nodes[desc.id] = desc;
+		$(self._title).text(desc.name);
 		attributeNames.map(function(attributeName) {
 		    if (self.docs[attributeName].__previous_value != desc.codeAttributes[attributeName].value) {
 			self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
