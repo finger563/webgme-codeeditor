@@ -56,15 +56,15 @@ define(['js/Constants',
 
         self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
 
-        // Remove current territory patterns
-        if (self._territoryId) {
-            self._client.removeUI(self._territoryId);
-        }
+        if (nodeId && nodeId != this.currentNodeInfo.id) {
+            // Remove current territory patterns
+            if (self._territoryId) {
+		self._client.removeUI(self._territoryId);
+            }
 
-        this.currentNodeInfo.id = nodeId;
-        this.currentNodeInfo.parentId = undefined;
+            this.currentNodeInfo.id = nodeId;
+            this.currentNodeInfo.parentId = undefined;
 
-        if (nodeId) {
             desc = this._getObjectDescriptor(nodeId);
             nodeName = (desc && desc.name);
             if (desc) {
