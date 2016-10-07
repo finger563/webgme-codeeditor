@@ -394,9 +394,11 @@ define([
 	try {
 	    if (this.selectedNode && this.selectedAttribute && cm) {
 		var value = cm.getValue();
+		console.log('Checking for difference in: ' + this.selectedAttribute);
 		if (value != this.docs[this.selectedAttribute].__previous_value) {
 		    console.log('Saving Changes.');
-		    this._client.setAttributes(this.selectedNode, this.selectedAttribute, cm.getValue());
+		    this._client.setAttributes(this.selectedNode, this.selectedAttribute, value);
+		    this.docs[this.selectedAttribute].__previous_value = value;
 		}
 	    }
 	}
@@ -409,6 +411,7 @@ define([
 	var buffer_select = event.target;
 	var newAttribute = buffer_select.options[buffer_select.selectedIndex].textContent;
 	if (newAttribute) {
+	    this.saveChanges(this.editor);
 	    var newDoc = this.docs[newAttribute];
 	    this.docs[this.selectedAttribute] = this.editor.swapDoc(newDoc);
 	    this.selectedAttribute = newAttribute;
@@ -464,6 +467,7 @@ define([
     CodeEditorWidget.prototype.addNode = function (desc) {
 	var self = this;
         if (desc) {
+	    self.saveChanges(self.editor); // save in case we're moving and haven't saved yet
 	    $(self._title).text(desc.name);
 	    var attributeNames = Object.keys(desc.codeAttributes);
 	    if (attributeNames.length > 0) {
@@ -528,7 +532,7 @@ define([
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
         console.log('CodeEditorWidget:: saving when being destroyed');
-	this.saveChanges();
+	this.saveChanges(this.editor);
     };
 
     CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
@@ -545,7 +549,7 @@ define([
 
     CodeEditorWidget.prototype.onDeactivate = function () {
         console.log('CodeEditorWidget:: saving when being deactivated');
-	this.saveChanges();
+	this.saveChanges(this.editor);
     };
 
     return CodeEditorWidget;
