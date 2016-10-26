@@ -362,7 +362,8 @@ define([
 		width: '100%',
 		height: '100%'
 	    });
-	    $(container).zIndex(9999);
+	    //$(container).zIndex(9999);
+	    $(container).css('zIndex',9999);
 	    $(container).prependTo(document.body);
 	    $(container).find('.CodeMirror').css({
 		height: cmPercent
@@ -379,7 +380,8 @@ define([
 		width: '100%',
 		height: '100%'
 	    });
-	    $(container).zIndex('auto');
+	    //$(container).zIndex('auto');
+	    $(container).css('zIndex','auto');
 	    $(container).appendTo(this._el);
 	    $(container).find('.CodeMirror').css({
 		height: cmPercent
