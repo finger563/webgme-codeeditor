@@ -34,3 +34,6 @@ node_modules
 
 # local storage
 blob-local-storage
+
+# webstorm
+.idea
