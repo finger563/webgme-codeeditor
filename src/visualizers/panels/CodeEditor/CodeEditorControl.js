@@ -203,9 +203,9 @@ define(['js/Constants',
         this._displayToolbarItems();
 
         if (this.currentNodeInfo && typeof this.currentNodeInfo.id === 'string') {
-            WebGMEGlobal.State.registerSuppressVisualizerFromNode(true);
-            WebGMEGlobal.State.registerActiveObject(this.currentNodeInfo.id);
-            WebGMEGlobal.State.registerSuppressVisualizerFromNode(false);
+            WebGMEGlobal.State.registerActiveObject(this.currentNodeInfo.id, {
+                suppressVisualizerFromNode: true
+            });
         }
     };
 

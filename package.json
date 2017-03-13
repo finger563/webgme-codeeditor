@@ -1,5 +1,19 @@
 {
   "name": "webgme-codeeditor",
+  "description": "Code Editor Visualizer for webgme using CodeMirror",
+  "repository": {
+    "type": "git",
+    "url": "git+https://finger563@github.com/finger563/webgme-codeeditor.git"
+  },
+  "keywords": [
+    "webgme",
+    "webgme-component",
+    "text-editor",
+    "visualizer",
+    "codemirror"
+  ],
+  "author": "William Emfinger",
+  "license": "MIT",
   "scripts": {
     "start": "node app.js",
     "test": "node ./node_modules/mocha/bin/mocha --recursive test",
