@@ -9,7 +9,7 @@ var config = require('./config.webgme'),
 
 // Seeds
 config.seedProjects.enable = true;
-config.seedProjects.basePaths = ["./src/seeds"]
+config.seedProjects.basePaths = ["./src/seeds"];
 
 config.requirejsPaths['codemirror'] = './node_modules/codemirror';
 config.requirejsPaths['jsonlint'] = './node_modules/jsonlint/web';
