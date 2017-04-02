@@ -86,7 +86,11 @@ define([
     'codemirror/addon/fold/markdown-fold',
     'codemirror/addon/fold/comment-fold',
     // CSS
+    // codeEditorWidget
     'css!./styles/CodeEditorWidget.css',
+    // jsTree
+    'css!jstree/themes/default/style.min.css',
+    // codeMirror
     'css!codemirror/addon/lint/lint.css',
     'css!codemirror/addon/hint/show-hint.css',
     'css!codemirror/addon/search/matchesonscrollbar.css',
