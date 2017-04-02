@@ -226,7 +226,7 @@ define([
 
     var CodeEditorWidget,
         WIDGET_CLASS = 'code-editor',
-        cmPercent = '94%';
+        cmPercent = '100%';
 
     CodeEditorWidget = function (logger, container, client) {
         this._logger = logger.fork('Widget');
@@ -283,7 +283,7 @@ define([
         this._el.append(CodeEditorHtml);
 	      this._container = this._el.find('#CODE_EDITOR_DIV').first();
 	      this._codearea = this._el.find('#codearea').first();
-	      this._title = this._el.find('#code_editor_title');
+	      //this._title = this._el.find('#code_editor_title');
 	      this.selectedAttribute = null;
 	      this.selectedNode = null;
 
@@ -480,7 +480,7 @@ define([
 	      var self = this;
         if (desc) {
 	          self.saveChanges(self.editor); // save in case we're moving and haven't saved yet
-	          $(self._title).text(desc.name);
+	          //$(self._title).text(desc.name);
 	          var attributeNames = Object.keys(desc.codeAttributes);
 	          if (attributeNames.length > 0) {
 		            self.nodes[desc.id] = desc;
@@ -516,7 +516,7 @@ define([
 	          var attributeNames = Object.keys(desc.codeAttributes);
 	          if (attributeNames.length > 0) {
 		            self.nodes[desc.id] = desc;
-		            $(self._title).text(desc.name);
+		            //$(self._title).text(desc.name);
 		            attributeNames.map(function(attributeName) {
 		                if (self.docs[attributeName].__previous_value != desc.codeAttributes[attributeName].value) {
 			                  self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
