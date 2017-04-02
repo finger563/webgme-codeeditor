@@ -9,8 +9,10 @@ define([
     'js/Utils/ComponentSettings',
     // HTML
     'text!./CodeEditor.html',
+    // JSTree
+    'jstree/jstree.min',
     // Codemirror
-    'codemirror/lib/codemirror', 
+    'codemirror/lib/codemirror',
     // Syntax highlighting
     'codemirror/mode/clike/clike',
     'codemirror/mode/markdown/markdown',
@@ -140,6 +142,9 @@ define([
 ], function (
     ComponentSettings,
     CodeEditorHtml,
+    // JSTree
+    jstree,
+    // CodeMirror
     CodeMirror,
     // Syntax Highlighting
     CodeMirrorModeClike,
@@ -325,6 +330,7 @@ define([
 	      this.editor.foldCode(CodeMirror.Pos(0, 0));
 	      // THEME SELECT
 	      this.theme_select = this._el.find("#theme_select").first();
+        this._el.find('#codeTree').jstree();
 	      $(this.theme_select).val(this._config.theme);
 	      this.theme_select.on('change', this.selectTheme.bind(this));
 
