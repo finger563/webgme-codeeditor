@@ -35,5 +35,9 @@
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "codemirror": "^5.25.0",
+    "jsonlint": "^1.6.2",
+    "jstree": "^3.3.3"
+  }
 }
