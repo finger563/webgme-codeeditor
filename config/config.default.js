@@ -14,6 +14,7 @@ config.seedProjects.basePaths = ["./src/seeds"];
 config.requirejsPaths['jstree'] = './node_modules/jstree/dist';
 config.requirejsPaths['codemirror'] = './node_modules/codemirror';
 config.requirejsPaths['jsonlint'] = './node_modules/jsonlint/web';
+config.requirejsPaths['svgAssets'] = "./node_modules/webgme/src/client/assets";
 
 validateConfig(config);
 module.exports = config;

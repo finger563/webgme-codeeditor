@@ -288,6 +288,31 @@ define([
 	      this.selectedAttribute = null;
 	      this.selectedNode = null;
 
+        // Tree browswer widget
+        this._el.find('#codeTree').jstree({
+            'types': {
+                "default": {
+                    "icon": "glyphicon glyphicon-flash"
+                },
+                "demo": {
+                    "icon": "glyphicon glyphicon-ok"
+                }
+            },
+            'plugins': ["types"],
+            'core': {
+                'data': {
+                    'text': 'Root Node',
+                    'type': 'demo',
+                    'data': 'my data'
+                }
+            }
+        });
+        this._el.find('#codeTree').on("changed.jstree", function(e, data) {
+            console.log("The selected nodes are:");
+            console.log(data.selected);
+            console.log(data.instance.get_selected(true)[0].text);
+            console.log(data.instance.get_node(data.selected[0]).text);
+        });
         this._handle = this._el.find('#codeEditorHandle');
         this._left = this._el.find('#codeEditorLeft');
         this._right = this._el.find('#codeEditorRight');
@@ -366,7 +391,6 @@ define([
 	      this.editor.foldCode(CodeMirror.Pos(0, 0));
 	      // THEME SELECT
 	      this.theme_select = this._el.find("#theme_select").first();
-        this._el.find('#codeTree').jstree();
 	      $(this.theme_select).val(this._config.theme);
 	      this.theme_select.on('change', this.selectTheme.bind(this));
 
