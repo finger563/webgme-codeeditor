@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "codemirror": "^5.25.0",
-    "jsonlint": "^1.6.2",
-    "jstree": "^3.3.3"
+    "jquery.fancytree": "^2.21.0",
+    "jsonlint": "^1.6.2"
   }
 }

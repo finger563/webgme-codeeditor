@@ -11,7 +11,7 @@ var config = require('./config.webgme'),
 config.seedProjects.enable = true;
 config.seedProjects.basePaths = ["./src/seeds"];
 
-config.requirejsPaths['jstree'] = './node_modules/jstree/dist';
+//config.requirejsPaths['fancytree'] = './node_modules/jquery.fancytree/dist';
 config.requirejsPaths['codemirror'] = './node_modules/codemirror';
 config.requirejsPaths['jsonlint'] = './node_modules/jsonlint/web';
 config.requirejsPaths['svgAssets'] = "./node_modules/webgme/src/client/assets";

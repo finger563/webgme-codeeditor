@@ -9,8 +9,8 @@ define([
     'js/Utils/ComponentSettings',
     // HTML
     'text!./CodeEditor.html',
-    // JSTree
-    'jstree/jstree.min',
+    // fancy tree
+    //'fancytree/jquery.fancytree-all.min',
     // Codemirror
     'codemirror/lib/codemirror',
     // Syntax highlighting
@@ -88,8 +88,8 @@ define([
     // CSS
     // codeEditorWidget
     'css!./styles/CodeEditorWidget.css',
-    // jsTree
-    'css!jstree/themes/default/style.min.css',
+    // fancytree
+    //'css!fancytree/skin-win8/ui.fancytree.min.css',
     // codeMirror
     'css!codemirror/addon/lint/lint.css',
     'css!codemirror/addon/hint/show-hint.css',
@@ -146,8 +146,8 @@ define([
 ], function (
     ComponentSettings,
     CodeEditorHtml,
-    // JSTree
-    jstree,
+    // fancytree
+    // fancytree,
     // CodeMirror
     CodeMirror,
     // Syntax Highlighting
@@ -284,35 +284,19 @@ define([
 
 	      this._container = this._el.find('#CODE_EDITOR_DIV').first();
 	      this._codearea = this._el.find('#codearea').first();
-	      //this._title = this._el.find('#code_editor_title');
 	      this.selectedAttribute = null;
 	      this.selectedNode = null;
 
         // Tree browswer widget
-        this._el.find('#codeTree').jstree({
-            'types': {
-                "default": {
-                    "icon": "glyphicon glyphicon-flash"
-                },
-                "demo": {
-                    "icon": "glyphicon glyphicon-ok"
-                }
-            },
-            'plugins': ["types"],
-            'core': {
-                'data': {
-                    'text': 'Root Node',
-                    'type': 'demo',
-                    'data': 'my data'
-                }
-            }
+        this._treeBrowser = this._el.find('#codeTree');
+        this._treeBrowser.fancytree({
+            "checkbox": false,
+            'source': []
         });
-        this._el.find('#codeTree').on("changed.jstree", function(e, data) {
-            console.log("The selected nodes are:");
-            console.log(data.selected);
-            console.log(data.instance.get_selected(true)[0].text);
-            console.log(data.instance.get_node(data.selected[0]).text);
-        });
+        this._fancyTree = this._el.find('#codeTree').fancytree('getTree');
+        this._fancyTree.render();
+
+        // Split view resizing
         this._handle = this._el.find('#codeEditorHandle');
         this._left = this._el.find('#codeEditorLeft');
         this._right = this._el.find('#codeEditorRight');
@@ -373,7 +357,6 @@ define([
 	          _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval)
 	      );
 
-	      var self=this;
 	      this.editor.setOption("extraKeys", {
 	          'F11': function(cm) {
 		            //cm.setOption('fullScreen', !cm.getOption('fullScreen'));
@@ -536,12 +519,20 @@ define([
 	      var self = this;
         if (desc) {
 	          self.saveChanges(self.editor); // save in case we're moving and haven't saved yet
-	          //$(self._title).text(desc.name);
+            //tree.clear();
+            var newChild = self._fancyTree.getRootNode().addChildren({
+                'title': desc.name,
+                'tooltip': desc.type,
+                'folder': true
+            });
 	          var attributeNames = Object.keys(desc.codeAttributes);
 	          if (attributeNames.length > 0) {
 		            self.nodes[desc.id] = desc;
 		            self.selectedNode = desc.id;
 		            attributeNames.map(function(attributeName) {
+                    newChild.addChildren({
+                        'title': attributeName
+                    });
 		                // add the attributes to buffers
 		                var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
 			                      self._config.syntaxToModeMap[self._config.defaultSyntax];
@@ -553,6 +544,7 @@ define([
 		            self.selectedAttribute = attributeNames[0];
 		            self.editor.swapDoc(self.docs[self.selectedAttribute]);
 		            self.editor.refresh();
+                self._fancyTree.render();
 	          }
         }
     };
