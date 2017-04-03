@@ -296,6 +296,11 @@ define([
         this._fancyTree = this._el.find('#codeTree').fancytree('getTree');
         this._fancyTree.render();
 
+        this._treeBrowser.on('fancytreeactivate', function(event, data) {
+            var node = data.node;
+            self.selectBuffer(node.title);
+        });
+
         // Split view resizing
         this._handle = this._el.find('#codeEditorHandle');
         this._left = this._el.find('#codeEditorLeft');
@@ -392,9 +397,6 @@ define([
 	      $(this.syntax_select).val(this._config.defaultSyntax);
 	      this.syntax_select.on('change', this.selectSyntax.bind(this));
 
-	      this.buffer_select = this._el.find("#buffer_select").first();
-	      this.buffer_select.on('change', this.selectBuffer.bind(this));
-
 	      this.docs = {};
 	      $(this._el).find('.CodeMirror').css({
 	          height: cmPercent
@@ -458,10 +460,9 @@ define([
 	      }
     };
 
-    CodeEditorWidget.prototype.selectBuffer = function(event) {
-	      var buffer_select = event.target;
-	      var newAttribute = buffer_select.options[buffer_select.selectedIndex].textContent;
-	      if (newAttribute) {
+    CodeEditorWidget.prototype.selectBuffer = function(bufferName) {
+	      var newAttribute = bufferName;
+	      if (this.docs[newAttribute]) {
 	          this.saveChanges(this.editor);
 	          var newDoc = this.docs[newAttribute];
 	          this.docs[this.selectedAttribute] = this.editor.swapDoc(newDoc);
@@ -531,7 +532,8 @@ define([
 		            self.selectedNode = desc.id;
 		            attributeNames.map(function(attributeName) {
                     newChild.addChildren({
-                        'title': attributeName
+                        'title': attributeName,
+                        'folder': false
                     });
 		                // add the attributes to buffers
 		                var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
