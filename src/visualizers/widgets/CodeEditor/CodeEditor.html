@@ -1,72 +1,86 @@
-<div id="CODE_EDITOR_DIV" style="position:absolute; background-color: white; width: 100%; height: 100%">
-  <div style="float:left; width: 20%; height: 100%" id="codeTree">
+<div id="CODE_EDITOR_DIV" style="position:absolute; background-color: white; width: 100%; height: 100%; overflow: hidden">
+  <div id="codeEditorLeft">
     <div>
-      Selection: <select id="buffer_select"></select>
-      Highlighting: <select id="syntax_select"></select>
-      Theme: <select id="theme_select"> 
-        <option value="default">default</option>
-        <option value="3024-day">3024-day</option>
-        <option value="3024-night">3024-night</option>
-        <option value="abcdef">abcdef</option>
-        <option value="ambiance">ambiance</option>
-        <option value="base16-dark">base16-dark</option>
-        <option value="base16-light">base16-light</option>
-        <option value="bespin">bespin</option>
-        <option value="blackboard">blackboard</option>
-        <option value="cobalt">cobalt</option>
-        <option value="colorforth">colorforth</option>
-        <option value="dracula">dracula</option>
-        <option value="eclipse">eclipse</option>
-        <option value="elegant">elegant</option>
-        <option value="erlang-dark">erlang-dark</option>
-        <option value="hopscotch">hopscotch</option>
-        <option value="icecoder">icecoder</option>
-        <option value="isotope">isotope</option>
-        <option value="lesser-dark">lesser-dark</option>
-        <option value="liquibyte">liquibyte</option>
-        <option value="material">material</option>
-        <option value="mbo">mbo</option>
-        <option value="mdn-like">mdn-like</option>
-        <option value="midnight">midnight</option>
-        <option value="monokai">monokai</option>
-        <option value="neat">neat</option>
-        <option value="neo">neo</option>
-        <option value="night">night</option>
-        <option value="paraiso-dark">paraiso-dark</option>
-        <option value="paraiso-light">paraiso-light</option>
-        <option value="pastel-on-dark">pastel-on-dark</option>
-        <option value="railscasts">railscasts</option>
-        <option value="rubyblue">rubyblue</option>
-        <option value="seti">seti</option>
-        <option value="solarized dark">solarized dark</option>
-        <option value="solarized light">solarized light</option>
-        <option value="the-matrix">the-matrix</option>
-        <option value="tomorrow-night-bright">tomorrow-night-bright</option>
-        <option value="tomorrow-night-eighties">tomorrow-night-eighties</option>
-        <option value="ttcn">ttcn</option>
-        <option value="twilight">twilight</option>
-        <option value="vibrant-ink">vibrant-ink</option>
-        <option value="xq-dark">xq-dark</option>
-        <option value="xq-light">xq-light</option>
-        <option value="yeti">yeti</option>
-        <option value="zenburn">zenburn</option>
-      </select>
-      Keybinding: <select id="kb_select">
-        <option value="sublime">sublime</option>
-        <option value="emacs">emacs</option>
-        <option value="vim">vim</option>
-      </select>
+      <div>
+        Selection: <select id="buffer_select"></select>
+      </div>
+      <div>
+        Highlighting: <select id="syntax_select"></select>
+      </div>
+      <div>
+        Theme: <select id="theme_select"> 
+          <option value="default">default</option>
+          <option value="3024-day">3024-day</option>
+          <option value="3024-night">3024-night</option>
+          <option value="abcdef">abcdef</option>
+          <option value="ambiance">ambiance</option>
+          <option value="base16-dark">base16-dark</option>
+          <option value="base16-light">base16-light</option>
+          <option value="bespin">bespin</option>
+          <option value="blackboard">blackboard</option>
+          <option value="cobalt">cobalt</option>
+          <option value="colorforth">colorforth</option>
+          <option value="dracula">d racula</option>
+          <option value="eclipse">eclipse</option>
+          <option value="elegant">elegant</option>
+          <option value="erlang-dark">erlang-dark</option>
+          <option value="hopscotch">hopscotch</option>
+          <option value="icecoder">icecoder</option>
+          <option value="isotope">isotope</option>
+          <option value="lesser-dark">lesser-dark</option>
+          <option value="liquibyte">liquibyte</option>
+          <option value="material">material</option>
+          <option value="mbo">mbo</option>
+          <option value="mdn-like">mdn-like</option>
+          <option value="midnight">midnight</option>
+          <option value="monokai">monokai</option>
+          <option value="neat">neat</option>
+          <option value="neo">neo</option>
+          <option value="night">night</option>
+          <option value="paraiso-dark">paraiso-dark</option>
+          <option value="paraiso-light">paraiso-light</option>
+          <option value="pastel-on-dark">pastel-on-dark</option>
+          <option value="railscasts">railscasts</option>
+          <option value="rubyblue">rubyblue</option>
+          <option value="seti">seti</option>
+          <option value="solarized dark">solarized dark</option>
+          <option value="solarized light">solarized light</option>
+          <option value="the-matrix">the-matrix</option>
+          <option value="tomorrow-night-bright">tomorrow-night-bright</option>
+          <option value="tomorrow-night-eighties">tomorrow-night-eighties</option>
+          <option value="ttcn">ttcn</option>
+          <option value="twilight">twilight</option>
+          <option value="vibrant-ink">vibrant-ink</option>
+          <option value="xq-dark">xq-dark</option>
+          <option value="xq-light">xq-light</option>
+          <option value="yeti">yeti</option>
+          <option value="zenburn">zenburn</option>
+        </select>
+      </div>
+      <div>
+        Keybinding: <select id="kb_select">
+          <option value="sublime">sublime</option>
+          <option value="emacs">emacs</option>
+          <option value="vim">vim</option>
+        </select>
+      </div>
     </div>
-    <ul>
-      <li>Root node
-        <ul>
-          <li>Child node 1</li>
-          <li>Child node 2</li>
-        </ul>
-      </li>
-    </ul>
+    <div id="codeTree">
+      <ul>
+        <li>Root node
+          <ul>
+            <li>Child node 1</li>
+            <li>Child node 2</li>
+          </ul>
+        </li>
+      </ul>
+    </div>
   </div>
-  <div style="float:right; height: 100%; width: 80%">
+  <div id="codeEditorHandle" class="ui-layout-resizer ui-draggable-handle ui-layout-resizer-open" style="float: left; width: 3px; height: 100%; padding: 0px; margin: 0px; font-size: 1px; text-align: left; overflow: hidden; z-index: 2; cursor: w-resize">
+    <div id="" class="ui-layout-toggler ui-layout-toggler-open" title="Close" style="padding: 0px; margin: 0px; overflow: hidden; text-align: center; font-size: 1px; cursor: pointer; z-index: 1; visibility: visible; height: 48px; width: 3px;">
+    </div>
+  </div>
+  <div id="codeEditorRight">
     <textarea id="codearea"></textarea>
   </div>
 </div>

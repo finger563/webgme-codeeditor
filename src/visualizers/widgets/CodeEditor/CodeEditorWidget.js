@@ -215,12 +215,12 @@ define([
     CodeMirrorJumpToLine,
     CodeMirrorAnnotateScrollbar,
     CodeMirrorDialog,
-    CodeMirrorFullScreen, 
-    CodeMirrorFoldCode, 
+    CodeMirrorFullScreen,
+    CodeMirrorFoldCode,
     CodeMirrorFoldGutter,
-    CodeMirrorBraceFold, 
-    CodeMirrorXMLFold, 
-    CodeMirrorMarkdownFold, 
+    CodeMirrorBraceFold,
+    CodeMirrorXMLFold,
+    CodeMirrorMarkdownFold,
     CodeMirrorCommentFold) {
     'use strict';
 
@@ -281,11 +281,43 @@ define([
 	      this._readOnly = this._client.isProjectReadOnly();
 	      this._fullscreen = false;
         this._el.append(CodeEditorHtml);
+
 	      this._container = this._el.find('#CODE_EDITOR_DIV').first();
 	      this._codearea = this._el.find('#codearea').first();
 	      //this._title = this._el.find('#code_editor_title');
 	      this.selectedAttribute = null;
 	      this.selectedNode = null;
+
+        this._handle = this._el.find('#codeEditorHandle');
+        this._left = this._el.find('#codeEditorLeft');
+        this._right = this._el.find('#codeEditorRight');
+
+        this._left.css('width', '49%');
+        this._right.css('width', '49%');
+
+        this.isDragging = false;
+
+        this._handle.mousedown(function(e) {
+            self.isDragging = true;
+            e.preventDefault();
+        });
+        this._container.mouseup(function() {
+            self.isDragging = false;
+        }).mousemove(function(e) {
+            if (self.isDragging) {
+                var maxWidth = $('.ui-layout-pane-center').width();
+                var handleWidth = $('#codeEditorHandle').width();
+                var handlePercent = handleWidth / maxWidth * 100;
+                var minX = $('.ui-layout-pane-center').position().left;
+                var maxX = $('.ui-layout-pane-center').width() + minX;
+                var leftWidth = e.pageX - minX;
+                var leftPercent = Math.max(10, Math.ceil((leftWidth - handleWidth/2) / maxWidth * 100));
+                var rightPercent = Math.max(10, Math.ceil(100 - leftPercent - handlePercent));
+                leftPercent = Math.floor(100 - rightPercent - handlePercent);
+                self._left.css('width', leftPercent + '%');
+                self._right.css('width', rightPercent + '%');
+            }
+        });
 
 	      var mac = CodeMirror.keyMap.default == CodeMirror.keyMap.macDefault;
 	      CodeMirror.keyMap.default[(mac ? "Cmd" : "Ctrl") + "-Space"] = "autocomplete";

@@ -12,3 +12,10 @@
 .CodeMirror {
     height: 100%;
 }
+
+#codeEditorLeft, #codeEditorRight {
+    float:left;
+    height:100%;
+    width:48%;
+}
+
