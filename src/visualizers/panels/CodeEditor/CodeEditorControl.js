@@ -100,7 +100,7 @@ define(['js/Constants',
 	var self = this;
 	var client = this._client;
         var nodeObj = client.getNode(nodeId),
-            objDescriptor;
+            objDescriptor = null;
 
         if (nodeObj) {
             objDescriptor = {
@@ -130,6 +130,10 @@ define(['js/Constants',
 			};
 		    });
 		}
+	    }
+
+	    if (self._config.excludeTypes.indexOf(nodeMetaName) > -1) {
+		return null; // exclude these types
 	    }
 
             objDescriptor.id = nodeObj.getId();

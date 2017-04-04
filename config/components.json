@@ -5,6 +5,7 @@
         "autoSaveInterval": "2000",
 	"defaultSyntax": "gfm",
 	"rootType": "Project",
+	"excludeTypes": ["ExcludeType"],
 	"loadDepth": 5,
 	"syntaxToModeMap": {
 	    "gfm": {"name":"gfm"},

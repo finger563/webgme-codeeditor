@@ -258,6 +258,7 @@ define([
 	    'defaultSyntax': 'cpp',
 	    'syntaxToModeMap': {},
 	    'rootType': '',
+	    'excludeTypes': [],
 	    'loadDepth': 5,
 	    'autoSaveInterval': 2000,
 	    'attrToSyntaxMap': {}
