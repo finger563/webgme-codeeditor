@@ -24,10 +24,10 @@
     "merge": "node ./node_modules/webgme/src/bin/merge.js",
     "plugin": "node ./node_modules/webgme/src/bin/run_plugin.js",
     "users": "node ./node_modules/webgme/src/bin/usermanager.js",
-      "clean_up": "node ./node_modules/webgme/src/bin/clean_up.js",
-      "postinstall": "bower install"
+    "clean_up": "node ./node_modules/webgme/src/bin/clean_up.js",
+    "postinstall": "bower install"
   },
-  "version": "2.0.1",
+  "version": "3.0.0",
   "peerDependencies": {
     "webgme": "^2.0.0"
   },
@@ -36,6 +36,5 @@
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
-  "dependencies": {
-  }
+  "dependencies": {}
 }
