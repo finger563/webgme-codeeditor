@@ -310,13 +310,13 @@ define([
 
         this._treeBrowser.on('fancytreeactivate', function(event, data) {
             // save old buffer
-	          self.saveChanges(this.editor);
+	    self.saveChanges(this.editor);
             // now select new buffer
             var node = data.node;
             node.setActive(true);
             node.setSelected(true);
             // swap to new buffer
-            self.swapBuffer(self.getActiveInfo());
+            self.swapBuffer();
         });
 
         // Split view resizing
@@ -467,49 +467,70 @@ define([
         return retData;
     };
 
-    CodeEditorWidget.prototype.saveChanges = function(cm, changes) {
-	      try {
-            var activeInfo = this.getActiveInfo();
-	          if (activeInfo.attribute && cm) {
-		            var value = cm.getValue();
-		            console.log('Checking for difference in: ' + activeInfo.attribute);
-		            if (value != activeInfo.document.__previous_value) {
-		                console.log('Saving Changes.');
-		                this._client.setAttribute(activeInfo.webgmeNode, activeInfo.attribute, value);
-                    var doc = activeInfo.document;
-                    doc.__previous_value = value;
-		                activeInfo.activeNode.fromDict({
-                        'data': doc
-                    });
-		            }
-	          }
-	      }
-	      catch (e) {
-	          this._logger.error('Saving META failed: ' + e);
-	      }
+    CodeEditorWidget.prototype.getNodeInfo = function(gmeId) {
+	var self = this;
+	var retData = {};
+	var parentNode = self._fancyTree.getNodeByKey(gmeId);
+	if (parentNode) {
+	    retData.node = parentNode;
+	    retData.webgmeNode = gmeId;
+	    var children = parentNode.getChildren();
+	    children.map(function(child) {
+		retData.attributes[child.title] = {
+		    'node': child,
+		    'document': child.data
+		}
+	    });
+	}
+	return retData;
     };
 
-    CodeEditorWidget.prototype.swapBuffer = function(newActiveInfo) {
+    CodeEditorWidget.prototype.saveChanges = function(cm, changes) {
+	try {
+	    if (this._activeInfo.attribute && cm) {
+		var value = cm.getValue();
+		console.log('Checking for difference in: ' + this._activeInfo.attribute);
+		if (value != this._activeInfo.document.__previous_value) {
+		    console.log('Saving Changes.');
+		    console.log(this._activeInfo.attribute);
+		    console.log(this._activeInfo.webgmeNode);
+		    console.log(value);
+		    this._client.setAttribute(this._activeInfo.webgmeNode.id, this._activeInfo.attribute, value);
+                    var doc = this._activeInfo.document;
+                    doc.__previous_value = value;
+		    this._activeInfo.activeNode.fromDict({
+                        'data': doc
+                    });
+		}
+	    }
+	}
+	catch (e) {
+	    this._logger.error('Saving META failed: ' + e);
+	}
+    };
+
+    CodeEditorWidget.prototype.swapBuffer = function() {
         // TODO: Update to not just use attribute name to support multiple nodes
         var self = this;
-	      if (newActiveInfo.document) {
-	          var newDoc = newActiveInfo.document;
-	          this.editor.swapDoc(newDoc);
-	          this.editor.refresh();
-	      }
+	self._activeInfo = self.getActiveInfo();
+	if (self._activeInfo.document) {
+	    var newDoc = self._activeInfo.document;
+	    this.editor.swapDoc(newDoc);
+	    this.editor.refresh();
+	}
     };
 
     CodeEditorWidget.prototype.saveConfig = function() {
-	      var self=this;
-	      ComponentSettings.overwriteComponentSettings(
-	          CodeEditorWidget.getComponentId(), this._config,
-	          function (err) {
-		            if (err) {
-		                self._logger.error(err);
-		            }
-		            else
-		                WebGMEGlobal.userInfo.settings[CodeEditorWidget.getComponentId()] = self._config;
-	          });
+	var self=this;
+	ComponentSettings.overwriteComponentSettings(
+	    CodeEditorWidget.getComponentId(), this._config,
+	    function (err) {
+		if (err) {
+		    self._logger.error(err);
+		}
+		else
+		    WebGMEGlobal.userInfo.settings[CodeEditorWidget.getComponentId()] = self._config;
+	    });
     };
 
     CodeEditorWidget.prototype.selectTheme = function(event) {
@@ -537,73 +558,83 @@ define([
     // Adding/Removing/Updating items
     CodeEditorWidget.prototype.addNode = function (desc) {
         // TODO: Update to figure out which tree item is the parent
-	      var self = this;
+	var self = this;
         if (desc) {
-	          self.saveChanges(self.editor); // save in case we're moving and haven't saved yet
+	    self.saveChanges(self.editor); // save in case we're moving and haven't saved yet
             //tree.clear();
-            var newChild = self._fancyTree.getRootNode().addChildren({
+	    var parentNode = self._fancyTree.getRootNode();
+	    if (self.nodes[desc.parentId])
+		parentNode = self._fancyTree.getNodeByKey(desc.parentId);
+            var newChild = parentNode.addChildren({
                 'title': desc.name,
                 'tooltip': desc.type,
                 'folder': true,
-                'data': desc.id
+                'data': desc.id,
+		'id': desc.id
             });
-	          var attributeNames = Object.keys(desc.codeAttributes);
-	          if (attributeNames.length > 0) {
-		            self.nodes[desc.id] = desc;
-		            attributeNames.map(function(attributeName) {
-		                // add the attributes to buffers
-		                var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
-			                      self._config.syntaxToModeMap[self._config.defaultSyntax];
-		                var doc = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
-		                doc.__previous_value = desc.codeAttributes[attributeName].value;
+	    var attributeNames = Object.keys(desc.codeAttributes);
+	    if (attributeNames.length > 0) {
+		self.nodes[desc.id] = desc;
+		attributeNames.map(function(attributeName) {
+		    // add the attributes to buffers
+		    var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
+			self._config.syntaxToModeMap[self._config.defaultSyntax];
+		    var doc = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
+		    doc.__previous_value = desc.codeAttributes[attributeName].value;
                     // add the attribute to the new tree node
                     newChild.addChildren({
                         'title': attributeName,
                         'folder': false,
                         'data': doc
                     });
-		            });
-		            // select the first attribute?
-		            self.editor.swapDoc(newChild.getChildren()[0].data);
-		            self.editor.refresh();
+		});
+		// select the first attribute?
+		self.editor.swapDoc(newChild.getChildren()[0].data);
+		self.editor.refresh();
                 self._fancyTree.render();
-	          }
+	    }
         }
     };
 
     CodeEditorWidget.prototype.removeNode = function (gmeId) {
         // TODO: Update to check which node is removed and update tree or remove viz accordingly
-	      var self = this;
+	var self = this;
         var desc = this.nodes[gmeId];
-	      if(desc) {
-	          $(this._el).find('#CODE_EDITOR_DIV').first().detach();
+	if(desc) {
+	    $(this._el).find('#CODE_EDITOR_DIV').first().detach();
             delete this.nodes[gmeId];
-	      }
+	}
     };
 
     CodeEditorWidget.prototype.updateNode = function (desc) {
         // TODO: Update to determine which attributes of which node to update.
-	      var self = this;
+	var self = this;
         if (desc) {
-	          var attributeNames = Object.keys(desc.codeAttributes);
-	          if (attributeNames.length > 0) {
-		            self.nodes[desc.id] = desc;
-		            //$(self._title).text(desc.name);
-		            attributeNames.map(function(attributeName) {
-		                if (self.docs[attributeName].__previous_value != desc.codeAttributes[attributeName].value) {
-			                  self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
-			                  var cursor = self.docs[attributeName].getCursor();
-			                  var lineCount = self.docs[attributeName].lineCount();
-			                  self.docs[attributeName].replaceRange(
-			                      desc.codeAttributes[attributeName].value,
-			                      {line:0, ch: 0},
-			                      {line:lineCount}
-			                  );
-			                  self.docs[attributeName].setCursor(cursor);
-		                }
-		            });
-		            self.editor.refresh();
-	          }
+	    var attributeNames = Object.keys(desc.codeAttributes);
+	    if (attributeNames.length > 0) {
+		self.nodes[desc.id] = desc;
+		var nodeInfo = self.getNodeInfo(desc.id);
+		if (nodeInfo.attributes) {
+		    attributeNames.map(function(attributeName) {
+			var doc = nodeInfo.attributes[attributeName].document;
+			if (doc.__previous_value != desc.codeAttributes[attributeName].value) {
+			    doc.__previous_value = desc.codeAttributes[attributeName].value;
+			    var cursor = doc.getCursor();
+			    var lineCount = doc.lineCount();
+			    doc.replaceRange(
+				desc.codeAttributes[attributeName].value,
+				{line:0, ch: 0},
+				{line:lineCount}
+			    );
+			    doc.setCursor(cursor);
+			    nodeInfo.attributes[attributeName].fromDict({
+				'data': doc
+			    });
+			}
+		    });
+		    self.editor.refresh();
+		}
+	    }
         }
     };
 
