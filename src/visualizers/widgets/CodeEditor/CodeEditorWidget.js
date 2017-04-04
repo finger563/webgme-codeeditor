@@ -301,7 +301,8 @@ define([
             'focusOnSelect': true,
             'icon': true, // make function returning icons,
             'imagePath': null, // store icons here for use,
-            'selectMode': 1, // single select mode
+            'selectMode': 1, // single select mode,
+	    'keyboard': false, // disable keyboard for now
             'source': []
         });
         this._fancyTree = this._el.find('#codeTree').fancytree('getTree');
