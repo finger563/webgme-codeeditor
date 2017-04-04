@@ -138,7 +138,7 @@ define(['js/Constants',
             objDescriptor.childrenIds = nodeObj.getChildrenIds();
             objDescriptor.childrenNum = objDescriptor.childrenIds.length;
             objDescriptor.parentId = nodeObj.getParentId();
-	    objDescriptor.iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
+	    objDescriptor.iconPath = '/assets/DecoratorSVG/' + nodeObj.getRegistry('TreeItemCollapsedIcon');
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
 	    if (objDescriptor.type != self._config.rootType) {
