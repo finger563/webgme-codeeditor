@@ -605,6 +605,7 @@ define([
 	    if (desc.id == WebGMEGlobal.State.getActiveObject())
 		self._fancyTree.activateKey(desc.id + '::' + attributeNames[0]);
 	    self.editor.refresh();
+	    self._fancyTree.getRootNode().sortChildren(null, true); // true for sorting deeply
             self._fancyTree.render();
 	}
 	self.updateDependencies();
