@@ -31,7 +31,7 @@ define(['js/Constants',
 	TypeToAttributeMap = this._config.attrToSyntaxMap;
 
         this.currentNodeInfo = {id: null, children: [], parentId: null};
-	this._topNode = '/v';
+        this._selfPatterns = {};
 
         this._initWidgetEventHandlers();
 
@@ -74,10 +74,9 @@ define(['js/Constants',
             this._refreshBtnModelHierarchyUp();
 
             // Put new node's info into territory rules
-            self._selfPatterns = {};
             // TODO: Update to get depth of children to load from component config
             // TODO: Update to get parents as well?
-            self._selfPatterns[nodeId] = {children: 5};  // Territory "rule"
+            self._selfPatterns[nodeId] = {children: self._config.loadDepth};  // Territory "rule"
 
             self._territoryId = self._client.addUI(self, function (events) {
                 self._eventCallback(events);
@@ -89,7 +88,7 @@ define(['js/Constants',
     };
 
     CodeEditorControl.prototype._refreshBtnModelHierarchyUp = function () {
-        if (this.currentNodeInfo.id && this.currentNodeInfo.id !== this._topNode) {
+        if (this.currentNodeInfo.id) {
             this.$btnModelHierarchyUp.show();
         } else {
             this.$btnModelHierarchyUp.hide();
@@ -106,6 +105,7 @@ define(['js/Constants',
         if (nodeObj) {
             objDescriptor = {
                 'id': undefined,
+		'type': undefined,
                 'name': undefined,
                 'childrenIds': undefined,
                 'parentId': undefined,
@@ -113,10 +113,11 @@ define(['js/Constants',
 		'codeAttributes': {}
             };
 
+	    var nodeMetaName = undefined;
 	    var baseId = nodeObj.getMetaTypeId();
 	    var baseObj = client.getNode(baseId);
 	    if (baseObj) {
-		var nodeMetaName = baseObj.getAttribute('name');
+		nodeMetaName = baseObj.getAttribute('name');
 		if (nodeMetaName && TypeToAttributeMap[nodeMetaName]) {
 		    var attrNames = Object.keys(TypeToAttributeMap[nodeMetaName]);
 		    attrNames.map(function(attrName) {
@@ -131,11 +132,18 @@ define(['js/Constants',
 	    }
 
             objDescriptor.id = nodeObj.getId();
+            objDescriptor.type = nodeMetaName;
             objDescriptor.name = nodeObj.getAttribute('name');
             objDescriptor.childrenIds = nodeObj.getChildrenIds();
             objDescriptor.childrenNum = objDescriptor.childrenIds.length;
             objDescriptor.parentId = nodeObj.getParentId();
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
+
+	    if (objDescriptor.type != self._config.rootType) {
+		// load parent until we get to rootType
+		self._selfPatterns[objDescriptor.parentId] = {children: self._config.loadDepth};
+		self._client.updateTerritory(self._territoryId, self._selfPatterns);
+	    }
         }
         return objDescriptor;
     };

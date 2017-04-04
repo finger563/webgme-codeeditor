@@ -4,6 +4,8 @@
 	"keyBinding": "sublime",
         "autoSaveInterval": "2000",
 	"defaultSyntax": "gfm",
+	"rootType": "Project",
+	"loadDepth": 5,
 	"syntaxToModeMap": {
 	    "gfm": {"name":"gfm"},
 	    "C++": {"name":"text/x-c++src", "useCPP": true},
