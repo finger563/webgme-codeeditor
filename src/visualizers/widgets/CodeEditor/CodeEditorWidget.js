@@ -605,7 +605,13 @@ define([
 	    if (desc.id == WebGMEGlobal.State.getActiveObject())
 		self._fancyTree.activateKey(desc.id + '::' + attributeNames[0]);
 	    self.editor.refresh();
-	    self._fancyTree.getRootNode().sortChildren(null, true); // true for sorting deeply
+	    self._fancyTree.getRootNode().sortChildren(
+		function(a, b) {
+		    var x = (a.isFolder() ? "1" : "0") + a.title.toLowerCase(),
+			y = (b.isFolder() ? "1" : "0") + b.title.toLowerCase();
+		    return x === y ? 0 : x > y ? 1 : -1;
+		},
+		true); // true for sorting deeply
             self._fancyTree.render();
 	}
 	self.updateDependencies();
