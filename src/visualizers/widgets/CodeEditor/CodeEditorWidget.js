@@ -308,6 +308,8 @@ define([
 
         this._treeBrowser.on('fancytreeactivate', function(event, data) {
             var node = data.node;
+            node.setActive(true);
+            node.setSelected(true);
             self.selectBuffer(node.title);
         });
 
