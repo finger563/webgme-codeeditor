@@ -59,7 +59,7 @@ define(['js/Constants',
         if (nodeId && nodeId != this.currentNodeInfo.id) {
             // Remove current territory patterns
             if (self._territoryId) {
-		self._client.removeUI(self._territoryId);
+		            self._client.removeUI(self._territoryId);
             }
 
             this.currentNodeInfo.id = nodeId;
@@ -75,7 +75,9 @@ define(['js/Constants',
 
             // Put new node's info into territory rules
             self._selfPatterns = {};
-            self._selfPatterns[nodeId] = {children: 0};  // Territory "rule"
+            // TODO: Update to get depth of children to load from component config
+            // TODO: Update to get parents as well?
+            self._selfPatterns[nodeId] = {children: 5};  // Territory "rule"
 
             self._territoryId = self._client.addUI(self, function (events) {
                 self._eventCallback(events);
