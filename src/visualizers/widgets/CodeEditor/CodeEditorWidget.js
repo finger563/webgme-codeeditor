@@ -629,7 +629,10 @@ define([
 	var self = this;
         var desc = this.nodes[gmeId];
 	if(desc) {
-	    $(this._el).find('#CODE_EDITOR_DIV').first().detach();
+	    //$(this._el).find('#CODE_EDITOR_DIV').first().detach();
+	    var treeNode = this._fancyTree.getNodeByKey(gmeId);
+	    if (treeNode)
+		treeNode.remove();
             delete this.nodes[gmeId];
 	}
     };
