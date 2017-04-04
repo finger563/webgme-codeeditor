@@ -323,8 +323,8 @@ define([
         this._left = this._el.find('#codeEditorLeft');
         this._right = this._el.find('#codeEditorRight');
 
-        this._left.css('width', '49%');
-        this._right.css('width', '49%');
+        this._left.css('width', '18%');
+        this._right.css('width', '80%');
 
         this.isDragging = false;
 
@@ -655,7 +655,7 @@ define([
 				{line:lineCount}
 			    );
 			    doc.setCursor(cursor);
-			    nodeInfo.attributes[attributeName].fromDict({
+			    nodeInfo.attributes[attributeName].node.fromDict({
 				'data': doc
 			    });
 			}
