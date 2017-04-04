@@ -110,7 +110,7 @@ define(['js/Constants',
                 'childrenIds': undefined,
                 'parentId': undefined,
                 'isConnection': false,
-		'iconPath': null,
+		'iconPath': undefined,
 		'codeAttributes': {}
             };
 
@@ -138,7 +138,9 @@ define(['js/Constants',
             objDescriptor.childrenIds = nodeObj.getChildrenIds();
             objDescriptor.childrenNum = objDescriptor.childrenIds.length;
             objDescriptor.parentId = nodeObj.getParentId();
-	    objDescriptor.iconPath = '/assets/DecoratorSVG/' + nodeObj.getRegistry('TreeItemCollapsedIcon');
+	    var iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
+	    if (iconPath)
+		objDescriptor.iconPath = '/assets/DecoratorSVG/' + iconPath;
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
 	    if (objDescriptor.type != self._config.rootType) {
