@@ -298,7 +298,7 @@ define([
             'activeVisible': true,
             'clickFolderMode': 2, // expand,
             'focusOnSelect': true,
-            'icon': false, // make function returning icons,
+            'icon': true, // make function returning icons,
             'imagePath': null, // store icons here for use,
             'selectMode': 1, // single select mode
             'source': []
@@ -577,6 +577,7 @@ define([
             'title': desc.name,
             'tooltip': desc.type,
             'folder': true,
+	    'icon': desc.iconPath,
             'data': desc,
 	    'key': desc.id
         });
@@ -596,12 +597,13 @@ define([
                     'title': attributeName,
                     'folder': false,
                     'data': doc,
-		    'key': childKey
+		    'key': childKey,
+		    'icon': 'glyphicon glyphicon-edit'
                 });
-		//self._fancyTree.activateKey(childKey);
 	    });
-	    // select the first attribute?
-	    //self.editor.swapDoc(newChild.getChildren()[0].data);
+	    // select the first attribute
+	    if (desc.id == WebGMEGlobal.State.getActiveObject())
+		self._fancyTree.activateKey(desc.id + '::' + attributeNames[0]);
 	    self.editor.refresh();
             self._fancyTree.render();
 	}

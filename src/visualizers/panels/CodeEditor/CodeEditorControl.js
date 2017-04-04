@@ -110,6 +110,7 @@ define(['js/Constants',
                 'childrenIds': undefined,
                 'parentId': undefined,
                 'isConnection': false,
+		'iconPath': null,
 		'codeAttributes': {}
             };
 
@@ -137,6 +138,7 @@ define(['js/Constants',
             objDescriptor.childrenIds = nodeObj.getChildrenIds();
             objDescriptor.childrenNum = objDescriptor.childrenIds.length;
             objDescriptor.parentId = nodeObj.getParentId();
+	    objDescriptor.iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
 	    if (objDescriptor.type != self._config.rootType) {
