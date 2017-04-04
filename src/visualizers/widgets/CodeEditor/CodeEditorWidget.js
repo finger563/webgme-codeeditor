@@ -10,6 +10,8 @@
 
 // TODO: Update to not save syntax highlighting selection and not allow user to change it
 
+// STORES NODES INTO TREE WITH UNIQUE IDs AS THE WEBGME PATH
+
 define([
     'js/Utils/ComponentSettings',
     // HTML
@@ -281,6 +283,8 @@ define([
         // set widget class
         //this._el.addClass(WIDGET_CLASS);
 
+        this._activeInfo = {};
+
         // Create the CodeEditor and options
 	      this._readOnly = this._client.isProjectReadOnly();
 	      this._fullscreen = false;
@@ -288,8 +292,6 @@ define([
 
 	      this._container = this._el.find('#CODE_EDITOR_DIV').first();
 	      this._codearea = this._el.find('#codearea').first();
-	      this.selectedAttribute = null;
-	      this.selectedNode = null;
 
         // Tree browswer widget
         this._treeBrowser = this._el.find('#codeTree');
@@ -307,10 +309,14 @@ define([
         this._fancyTree.render();
 
         this._treeBrowser.on('fancytreeactivate', function(event, data) {
+            // save old buffer
+	          self.saveChanges(this.editor);
+            // now select new buffer
             var node = data.node;
             node.setActive(true);
             node.setSelected(true);
-            self.selectBuffer(node.title);
+            // swap to new buffer
+            self.swapBuffer(self.getActiveInfo());
         });
 
         // Split view resizing
@@ -399,16 +405,6 @@ define([
 	      $(this.kb_select).val(this._config.keyBinding);
 	      this.kb_select.on('change', this.selectKeyBinding.bind(this));
 
-	      // SYNTAX HIGHLIGHTING SELECTION
-	      this.syntax_select = this._el.find("#syntax_select").first();
-	      var modeNames = Object.keys(this._config.syntaxToModeMap);
-	      var self = this;
-	      modeNames.map(function(modeName) {
-	          $(self.syntax_select).append(new Option(modeName, modeName));
-	      });
-	      $(this.syntax_select).val(this._config.defaultSyntax);
-	      this.syntax_select.on('change', this.selectSyntax.bind(this));
-
 	      this.docs = {};
 	      $(this._el).find('.CodeMirror').css({
 	          height: cmPercent
@@ -455,16 +451,36 @@ define([
 	      this.editor.refresh();
     };
 
+    CodeEditorWidget.prototype.getActiveInfo = function() {
+        var self = this;
+        var retData = {};
+        var selectedNodes = self._fancyTree.getSelectedNodes(); // should just return one
+        if (selectedNodes.length) {
+            var selectedAttribute = selectedNodes[0];
+            var selectedNode = selectedAttribute.getParent();
+            retData.activeNode = selectedAttribute;
+            retData.parentNode = selectedNode;
+            retData.webgmeNode = selectedNode.data;
+            retData.attribute = selectedAttribute.title;
+            retData.document = selectedAttribute.data;
+        }
+        return retData;
+    };
+
     CodeEditorWidget.prototype.saveChanges = function(cm, changes) {
-        // TODO: Update to save to the right node
 	      try {
-	          if (this.selectedNode && this.selectedAttribute && cm) {
+            var activeInfo = this.getActiveInfo();
+	          if (activeInfo.attribute && cm) {
 		            var value = cm.getValue();
-		            console.log('Checking for difference in: ' + this.selectedAttribute);
-		            if (value != this.docs[this.selectedAttribute].__previous_value) {
+		            console.log('Checking for difference in: ' + activeInfo.attribute);
+		            if (value != activeInfo.document.__previous_value) {
 		                console.log('Saving Changes.');
-		                this._client.setAttribute(this.selectedNode, this.selectedAttribute, value);
-		                this.docs[this.selectedAttribute].__previous_value = value;
+		                this._client.setAttribute(activeInfo.webgmeNode, activeInfo.attribute, value);
+                    var doc = activeInfo.document;
+                    doc.__previous_value = value;
+		                activeInfo.activeNode.fromDict({
+                        'data': doc
+                    });
 		            }
 	          }
 	      }
@@ -473,14 +489,12 @@ define([
 	      }
     };
 
-    CodeEditorWidget.prototype.selectBuffer = function(bufferName) {
+    CodeEditorWidget.prototype.swapBuffer = function(newActiveInfo) {
         // TODO: Update to not just use attribute name to support multiple nodes
-	      var newAttribute = bufferName;
-	      if (this.docs[newAttribute]) {
-	          this.saveChanges(this.editor);
-	          var newDoc = this.docs[newAttribute];
-	          this.docs[this.selectedAttribute] = this.editor.swapDoc(newDoc);
-	          this.selectedAttribute = newAttribute;
+        var self = this;
+	      if (newActiveInfo.document) {
+	          var newDoc = newActiveInfo.document;
+	          this.editor.swapDoc(newDoc);
 	          this.editor.refresh();
 	      }
     };
@@ -496,16 +510,6 @@ define([
 		            else
 		                WebGMEGlobal.userInfo.settings[CodeEditorWidget.getComponentId()] = self._config;
 	          });
-    };
-
-    CodeEditorWidget.prototype.selectSyntax = function(event) {
-        // TODO: REMOVE
-	      var self=this;
-	      var syntax_select = event.target;
-	      var syntax = syntax_select.options[syntax_select.selectedIndex].textContent;
-	      this._config.defaultSyntax = syntax;
-	      this.saveConfig();
-	      this.editor.setOption("mode", this._config.syntaxToModeMap[syntax]);
     };
 
     CodeEditorWidget.prototype.selectTheme = function(event) {
@@ -540,27 +544,27 @@ define([
             var newChild = self._fancyTree.getRootNode().addChildren({
                 'title': desc.name,
                 'tooltip': desc.type,
-                'folder': true
+                'folder': true,
+                'data': desc.id
             });
 	          var attributeNames = Object.keys(desc.codeAttributes);
 	          if (attributeNames.length > 0) {
 		            self.nodes[desc.id] = desc;
-		            self.selectedNode = desc.id;
 		            attributeNames.map(function(attributeName) {
-                    newChild.addChildren({
-                        'title': attributeName,
-                        'folder': false
-                    });
 		                // add the attributes to buffers
 		                var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
 			                      self._config.syntaxToModeMap[self._config.defaultSyntax];
-		                self.docs[attributeName] = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
-		                self.docs[attributeName].__previous_value = desc.codeAttributes[attributeName].value;
-		                $(self.buffer_select).append(new Option(attributeName, attributeName));
+		                var doc = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
+		                doc.__previous_value = desc.codeAttributes[attributeName].value;
+                    // add the attribute to the new tree node
+                    newChild.addChildren({
+                        'title': attributeName,
+                        'folder': false,
+                        'data': doc
+                    });
 		            });
 		            // select the first attribute?
-		            self.selectedAttribute = attributeNames[0];
-		            self.editor.swapDoc(self.docs[self.selectedAttribute]);
+		            self.editor.swapDoc(newChild.getChildren()[0].data);
 		            self.editor.refresh();
                 self._fancyTree.render();
 	          }
