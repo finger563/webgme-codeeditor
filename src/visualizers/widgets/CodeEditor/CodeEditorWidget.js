@@ -340,13 +340,26 @@ define([
             self.isDragging = false;
         }).mousemove(function(e) {
             if (self.isDragging) {
-                var selector = self._fullScreen ? self._containerTag : '.ui-layout-pane-center';
-                var maxWidth = $(selector).width();
+                var selector = $(self._el).find(self._containerTag);
+		var mousePosX = e.pageX;
+                if (self._fullScreen) {
+		    // now we're at the top of the document :)
+		    selector = $(document).find(self._containerTag).first();
+                }
+		else {
+		    // convert x position as needed
+		    // get offset from split panel
+                    mousePosX -= $(self._el).find(self._containerTag).parents('.panel-base-wh').parent().position().left;
+		    // get offset from west panel
+		    mousePosX -= $('.ui-layout-pane-center').position().left;
+                    //var selector = self._fullScreen ? self._containerTag : '.ui-layout-pane-center';
+		}
+                var maxWidth = selector.width();
                 var handleWidth = $('#codeEditorHandle').width();
                 var handlePercent = handleWidth / maxWidth * 100;
-                var minX = $(selector).position().left;
-                var maxX = $(selector).width() + minX;
-                var leftWidth = e.pageX - minX;
+                var minX = 0;
+                var maxX = selector.width() + minX;
+                var leftWidth = mousePosX - minX;
                 var leftPercent = Math.max(10, Math.ceil((leftWidth - handleWidth/2) / maxWidth * 100));
                 var rightPercent = Math.max(10, Math.ceil(100 - leftPercent - handlePercent));
                 leftPercent = Math.floor(100 - rightPercent - handlePercent);

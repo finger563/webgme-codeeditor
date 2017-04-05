@@ -26,9 +26,9 @@ define(['js/Constants',
         // Initialize core collections and variables
         this._widget = options.widget;
 
-	// the component config comes from widget._config
-	this._config = this._widget._config;
-	TypeToAttributeMap = this._config.attrToSyntaxMap;
+        // the component config comes from widget._config
+        this._config = this._widget._config;
+        TypeToAttributeMap = this._config.attrToSyntaxMap;
 
         this.currentNodeInfo = {id: null, children: [], parentId: null};
         this._selfPatterns = {};
@@ -51,15 +51,15 @@ define(['js/Constants',
     // (this allows the browser to then only load those relevant parts).
     CodeEditorControl.prototype.selectedObjectChanged = function (nodeId) {
         var self = this,
-	desc,
-	nodeName;
+        desc,
+        nodeName;
 
         self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
 
         if (nodeId && nodeId != this.currentNodeInfo.id) {
             // Remove current territory patterns
             if (self._territoryId) {
-		            self._client.removeUI(self._territoryId);
+                            self._client.removeUI(self._territoryId);
             }
 
             this.currentNodeInfo.id = nodeId;
@@ -97,44 +97,44 @@ define(['js/Constants',
 
     // This next function retrieves the relevant node information for the widget
     CodeEditorControl.prototype._getObjectDescriptor = function (nodeId) {
-	var self = this;
-	var client = this._client;
+        var self = this;
+        var client = this._client;
         var nodeObj = client.getNode(nodeId),
             objDescriptor = null;
 
         if (nodeObj) {
             objDescriptor = {
                 'id': undefined,
-		'type': undefined,
+                'type': undefined,
                 'name': undefined,
                 'childrenIds': undefined,
                 'parentId': undefined,
                 'isConnection': false,
-		'iconPath': undefined,
-		'codeAttributes': {}
+                'iconPath': undefined,
+                'codeAttributes': {}
             };
 
-	    var nodeMetaName = undefined;
-	    var baseId = nodeObj.getMetaTypeId();
-	    var baseObj = client.getNode(baseId);
-	    if (baseObj) {
-		nodeMetaName = baseObj.getAttribute('name');
-		if (nodeMetaName && TypeToAttributeMap[nodeMetaName]) {
-		    var attrNames = Object.keys(TypeToAttributeMap[nodeMetaName]);
-		    attrNames.map(function(attrName) {
-			var value = nodeObj.getAttribute(attrName); 
-			if (!value) value = '';
-			objDescriptor.codeAttributes[attrName] = { 
-			    value: value,
-			    mode: TypeToAttributeMap[nodeMetaName][attrName]
-			};
-		    });
-		}
-	    }
+            var nodeMetaName = undefined;
+            var baseId = nodeObj.getMetaTypeId();
+            var baseObj = client.getNode(baseId);
+            if (baseObj) {
+                nodeMetaName = baseObj.getAttribute('name');
+                if (nodeMetaName && TypeToAttributeMap[nodeMetaName]) {
+                    var attrNames = Object.keys(TypeToAttributeMap[nodeMetaName]);
+                    attrNames.map(function(attrName) {
+                        var value = nodeObj.getAttribute(attrName); 
+                        if (!value) value = '';
+                        objDescriptor.codeAttributes[attrName] = { 
+                            value: value,
+                            mode: TypeToAttributeMap[nodeMetaName][attrName]
+                        };
+                    });
+                }
+            }
 
-	    if (self._config.excludeTypes.indexOf(nodeMetaName) > -1) {
-		return null; // exclude these types
-	    }
+            if (self._config.excludeTypes.indexOf(nodeMetaName) > -1) {
+                return null; // exclude these types
+            }
 
             objDescriptor.id = nodeObj.getId();
             objDescriptor.type = nodeMetaName;
@@ -142,16 +142,16 @@ define(['js/Constants',
             objDescriptor.childrenIds = nodeObj.getChildrenIds();
             objDescriptor.childrenNum = objDescriptor.childrenIds.length;
             objDescriptor.parentId = nodeObj.getParentId();
-	    var iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
-	    if (iconPath)
-		objDescriptor.iconPath = '/assets/DecoratorSVG/' + iconPath;
+            var iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
+            if (iconPath)
+                objDescriptor.iconPath = '/assets/DecoratorSVG/' + iconPath;
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
-	    if (objDescriptor.type != self._config.rootType) {
-		// load parent until we get to rootType
-		self._selfPatterns[objDescriptor.parentId] = {children: self._config.loadDepth};
-		self._client.updateTerritory(self._territoryId, self._selfPatterns);
-	    }
+            if (objDescriptor.type != self._config.rootType) {
+                // load parent until we get to rootType
+                self._selfPatterns[objDescriptor.parentId] = {children: self._config.loadDepth};
+                self._client.updateTerritory(self._territoryId, self._selfPatterns);
+            }
         }
         return objDescriptor;
     };
