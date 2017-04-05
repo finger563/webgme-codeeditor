@@ -90,13 +90,13 @@ define([
     // CSS
     // codeEditorWidget
     'css!./styles/CodeEditorWidget.css',
+    'css!./bower_components/codemirror/lib/codemirror.css',
     'css!./bower_components/codemirror/addon/lint/lint.css',
     'css!./bower_components/codemirror/addon/hint/show-hint.css',
     'css!./bower_components/codemirror/addon/search/matchesonscrollbar.css',
     'css!./bower_components/codemirror/addon/dialog/dialog.css',
     'css!./bower_components/codemirror/addon/display/fullscreen.css',
     'css!./bower_components/codemirror/theme/night.css',
-    'css!./bower_components/codemirror/lib/codemirror.css',
     'css!./bower_components/codemirror/theme/3024-day.css',
     'css!./bower_components/codemirror/theme/3024-night.css',
     'css!./bower_components/codemirror/theme/abcdef.css',
@@ -237,6 +237,7 @@ define([
         });
 
         this.nodes = {};
+	this.docs = {};
         this.waitingNodes = {};
         this._initialize();
 
@@ -420,7 +421,6 @@ define([
         $(this.kb_select).val(this._config.keyBinding);
         this.kb_select.on('change', this.selectKeyBinding.bind(this));
 
-        this.docs = {};
         $(this._el).find('.CodeMirror').css({
             height: cmPercent
         });
@@ -477,7 +477,6 @@ define([
             retData.parentNode = selectedNode;
             retData.gmeId = selectedNode.data.id;
             retData.attribute = selectedAttribute.title;
-            retData.document = selectedAttribute.data;
         }
         return retData;
     };
@@ -493,26 +492,29 @@ define([
             var children = parentNode.getChildren();
             children.map(function(child) {
                 retData.attributes[child.title] = {
-                    'node': child,
-                    'document': child.data
+                    'node': child
                 };
             });
         }
         return retData;
     };
 
+    CodeEditorWidget.prototype.getActiveDoc = function() {
+	if (this.docs[this._activeInfo.gmeId])
+	    return this.docs[this._activeInfo.gmeId][this._activeInfo.attribute];
+	return null;
+    };
+
     CodeEditorWidget.prototype.saveChanges = function() {
         if (this._activeInfo.attribute) {
             var value = this.editor.getValue();
             console.log('Checking for difference in: ' + this._activeInfo.attribute);
-            if (value != this._activeInfo.document.__previous_value) {
+	    var doc = this.getActiveDoc();
+            if (value != doc.__previous_value) {
                 console.log('Saving Changes to ' + this._activeInfo.gmeId + ' : ' + this._activeInfo.attribute);
                 this._client.setAttribute(this._activeInfo.gmeId, this._activeInfo.attribute, value);
-                var doc = this._activeInfo.document;
                 doc.__previous_value = value;
-                this._activeInfo.activeNode.fromDict({
-                    'data': doc
-                });
+		this.docs[this._activeInfo.gmeId][this._activeInfo.attribute] = doc;
             }
         }
     };
@@ -520,8 +522,8 @@ define([
     CodeEditorWidget.prototype.swapBuffer = function() {
         var self = this;
         var newDoc = new CodeMirror.Doc(' ');
-        if (self._activeInfo.document) {
-            newDoc = self._activeInfo.document;
+        if (self.getActiveDoc()) {
+            newDoc = self.getActiveDoc();
         }
         this.editor.swapDoc(newDoc);
         this.editor.refresh();
@@ -598,6 +600,7 @@ define([
             'key': desc.id
         });
         self.nodes[desc.id] = desc;
+	self.docs[desc.id] = {};
         self.waitingNodes[desc.id] = undefined;
         var attributeNames = Object.keys(desc.codeAttributes);
         if (attributeNames.length > 0) {
@@ -607,12 +610,12 @@ define([
                         self._config.syntaxToModeMap[self._config.defaultSyntax];
                 var doc = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
                 doc.__previous_value = desc.codeAttributes[attributeName].value;
+		self.docs[desc.id][attributeName] = doc;
                 // add the attribute to the new tree node
                 var childKey = desc.id + '::' + attributeName;
                 newChild.addChildren({
                     'title': attributeName,
                     'folder': false,
-                    'data': doc,
                     'key': childKey,
                     'icon': 'glyphicon glyphicon-edit'
                 });
@@ -670,7 +673,7 @@ define([
                 var nodeInfo = self.getNodeInfo(desc.id);
                 if (nodeInfo.attributes) {
                     attributeNames.map(function(attributeName) {
-                        var doc = nodeInfo.attributes[attributeName].document;
+                        var doc = self.docs[desc.id][attributeName];
                         if (doc.__previous_value != desc.codeAttributes[attributeName].value) {
                             doc.__previous_value = desc.codeAttributes[attributeName].value;
                             var cursor = doc.getCursor();
@@ -681,9 +684,7 @@ define([
                                 {line:lineCount}
                             );
                             doc.setCursor(cursor);
-                            nodeInfo.attributes[attributeName].node.fromDict({
-                                'data': doc
-                            });
+			    self.docs[desc.id][attributeName] = doc;
                         }
                     });
                     self.editor.refresh();
