@@ -332,6 +332,7 @@ define([
         this._right.css('width', '80%');
 
         this.isDragging = false;
+        this._fullScreen = false;
 
         this._handle.mousedown(function(e) {
             self.isDragging = true;
@@ -427,6 +428,8 @@ define([
     };
 
     CodeEditorWidget.prototype.fullScreen = function(toFullScreen) {
+	if (this._fullScreen == toFullScreen)
+	    return;
         if (toFullScreen) {
             var container = $(this._el).find(this._containerTag).first();
             $(container).css({
