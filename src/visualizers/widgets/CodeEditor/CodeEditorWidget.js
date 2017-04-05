@@ -365,7 +365,7 @@ define([
             readOnly: this._readOnly,
             lineNumbers: true,
             matchBrackets: true,
-            lint: true,
+            lint: false,
             //viewPortMargin: Infinity,
             keyMap: this._config.keyBinding,
             path: './bower_components/codemirror/lib/',
@@ -386,11 +386,9 @@ define([
 
         this.editor.setOption("extraKeys", {
             'F11': function(cm) {
-                //cm.setOption('fullScreen', !cm.getOption('fullScreen'));
                 self.fullScreen(!self._fullScreen);
             },
             'Esc': function(cm) {
-                //cm.setOption('fullScreen', false);
                 self.fullScreen(false);
             },
             "Ctrl-Q": function(cm){
@@ -484,7 +482,7 @@ define([
                 retData.attributes[child.title] = {
                     'node': child,
                     'document': child.data
-                }
+                };
             });
         }
         return retData;
@@ -507,7 +505,6 @@ define([
     };
 
     CodeEditorWidget.prototype.swapBuffer = function() {
-        // TODO: Update to not just use attribute name to support multiple nodes
         var self = this;
         var newDoc = new CodeMirror.Doc(' ');
         if (self._activeInfo.document) {
@@ -640,7 +637,6 @@ define([
     };
 
     CodeEditorWidget.prototype.removeNode = function (gmeId) {
-        // TODO: Update to check which node is removed and update tree or remove viz accordingly
         var self = this;
         var desc = this.nodes[gmeId];
         if(desc) {
@@ -653,7 +649,6 @@ define([
     };
 
     CodeEditorWidget.prototype.updateNode = function (desc) {
-        // TODO: Update to determine which attributes of which node to update.
         var self = this;
         if (desc) {
             var attributeNames = Object.keys(desc.codeAttributes);
