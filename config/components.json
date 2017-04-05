@@ -8,7 +8,7 @@
 	"excludeTypes": ["ExcludeType"],
 	"loadDepth": 5,
 	"syntaxToModeMap": {
-	    "gfm": {"name":"gfm"},
+	    "gfm": {"name":"gfm", "icon": "glyphicon glyphicon-file"},
 	    "C++": {"name":"text/x-c++src", "useCPP": true},
 	    "JSON": {"name":"application/json"},
 	    "Python": {"name":"text/x-python"}

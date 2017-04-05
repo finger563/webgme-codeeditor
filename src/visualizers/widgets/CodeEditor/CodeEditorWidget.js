@@ -598,7 +598,7 @@ define([
             'title': desc.name,
             'tooltip': desc.type,
             'folder': true,
-            'icon': desc.iconPath,
+            'icon': desc.iconPath || 'glyphicon glyphicon-folder-open',
             'data': desc,
             'key': desc.id
         });
@@ -620,7 +620,7 @@ define([
                     'title': attributeName,
                     'folder': false,
                     'key': childKey,
-                    'icon': 'glyphicon glyphicon-edit'
+                    'icon': mode.icon || 'glyphicon glyphicon-edit'
                 });
             });
             // select the first attribute
