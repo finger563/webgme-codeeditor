@@ -319,6 +319,7 @@ define([
             node.setActive(true);
             node.setSelected(true);
             self._activeInfo = self.getActiveInfo();
+	    self.setGMESelection();
             // swap to new buffer
             self.swapBuffer();
         });
@@ -467,6 +468,23 @@ define([
             this._fullScreen = false;
         }
         this.editor.refresh();
+    };
+
+    CodeEditorWidget.prototype.setGMESelection = function() {
+	var self = this;
+	var selId = null;
+	var selectedTreeNodes = self._fancyTree.getSelectedNodes();
+	if (selectedTreeNodes.length) {
+	    var selNode = selectedTreeNodes[0]; // should just be one
+	    if (selNode.isFolder()) { // not a code attribute but an actual webGME node
+		selId = selNode.data.id;
+	    }
+	    else { // code attribute, need to get parent for real webGME node
+		selId = selNode.getParent().data.id;
+	    }
+	}
+	if (selId)
+	    WebGMEGlobal.State.registerActiveSelection([selId]);
     };
 
     CodeEditorWidget.prototype.getActiveInfo = function() {
