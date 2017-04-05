@@ -297,12 +297,12 @@ define([
         this._treeBrowser.fancytree({
             'checkbox': false,
             'activeVisible': true,
-            'clickFolderMode': 2, // expand,
+            'clickFolderMode': 3, // expand,
             'focusOnSelect': true,
             'icon': true, // make function returning icons,
             'imagePath': null, // store icons here for use,
             'selectMode': 1, // single select mode,
-	    'keyboard': false, // disable keyboard for now
+	    'keyboard': true, // disable keyboard for now
             'source': []
         });
         this._fancyTree = this._el.find('#codeTree').fancytree('getTree');
@@ -456,7 +456,7 @@ define([
         var self = this;
         var retData = {};
         var selectedNodes = self._fancyTree.getSelectedNodes(); // should just return one
-        if (selectedNodes.length) {
+        if (selectedNodes.length && !selectedNodes[0].isFolder()) {
             var selectedAttribute = selectedNodes[0];
             var selectedNode = selectedAttribute.getParent();
             retData.activeNode = selectedAttribute;
@@ -506,11 +506,12 @@ define([
     CodeEditorWidget.prototype.swapBuffer = function() {
         // TODO: Update to not just use attribute name to support multiple nodes
         var self = this;
-	if (self._activeInfo.document) {
-	    var newDoc = self._activeInfo.document;
-	    this.editor.swapDoc(newDoc);
-	    this.editor.refresh();
-	}
+        var newDoc = new CodeMirror.Doc(' ');
+	      if (self._activeInfo.document) {
+	          newDoc = self._activeInfo.document;
+	      }
+	      this.editor.swapDoc(newDoc);
+	      this.editor.refresh();
     };
 
     CodeEditorWidget.prototype.saveConfig = function() {
