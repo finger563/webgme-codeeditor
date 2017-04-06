@@ -93,13 +93,13 @@ This configuration can be found in
 
 ## Examples
 
-### Simple Exmaple
+### Simple Example
 
 Here is an example of running the test code in this repository:
 
 ![CodeEditor Test Seed Example](./img/simpleExample.png)
 
-### Embedded Exmaple
+### Embedded Example
 
 Here is an example of the CodeEditor in a live deployment of
 [ROSMOD](https://github.com/rosmod/webgme-rosmod) on the
@@ -107,7 +107,7 @@ Here is an example of the CodeEditor in a live deployment of
 
 ![CodeEditor ROSMOD Example](./img/rosmodExample.png)
 
-### Simple Exmaple
+### Split View Example
 
 Here is a complex example of using WebGME's split-view to run two
 CodeEditor instances side-by-side to view the code at different parts
