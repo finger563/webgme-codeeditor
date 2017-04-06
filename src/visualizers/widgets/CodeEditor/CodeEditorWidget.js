@@ -686,13 +686,19 @@ define([
     };
 
     CodeEditorWidget.prototype.updateNode = function (desc) {
+	// TODO: Handle non-code updates that affect tree, like name of node
         var self = this;
         if (desc) {
             var attributeNames = Object.keys(desc.codeAttributes);
             if (attributeNames.length > 0) {
                 self.nodes[desc.id] = desc;
                 var nodeInfo = self.getNodeInfo(desc.id);
+		if (nodeInfo.node) {
+		    // make sure the title is up to date
+		    nodeInfo.node.setTitle(desc.name);
+		}
                 if (nodeInfo.attributes) {
+		    // make sure the code is up to date
                     attributeNames.map(function(attributeName) {
                         var doc = self.docs[desc.id][attributeName];
                         if (doc.__previous_value != desc.codeAttributes[attributeName].value) {

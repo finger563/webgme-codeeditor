@@ -1,0 +1,25 @@
+{
+    "CodeEditor": {
+	"theme": "default",
+	"keyBinding": "sublime",
+        "autoSaveInterval": "2000",
+	"defaultSyntax": "gfm",
+	"rootType": "Project",
+	"excludeTypes": ["ExcludeType"],
+	"loadDepth": 5,
+	"syntaxToModeMap": {
+	    "gfm": {"name":"gfm", "icon": "glyphicon glyphicon-file"},
+	    "C++": {"name":"text/x-c++src", "useCPP": true},
+	    "JSON": {"name":"application/json"},
+	    "Python": {"name":"text/x-python"}
+	},
+	"attrToSyntaxMap": {
+	    "CodeObject": {
+		"Markdown": "gfm",
+		"C++": "C++",
+		"JSON": "JSON",
+		"Python": "Python"
+	    }
+	}
+    }
+}
