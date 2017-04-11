@@ -258,7 +258,7 @@ define([
             'keyBinding': 'sublime',
             'defaultSyntax': 'cpp',
             'syntaxToModeMap': {},
-            'rootType': '',
+            'rootTypes': [],
             'excludeTypes': [],
             'loadDepth': 5,
             'autoSaveInterval': 2000,
@@ -585,11 +585,16 @@ define([
         //console.log('Widget is resizing...');
     };
 
+    CodeEditorWidget.prototype.isRootType(type) {
+	var self = this;
+	return self._config.rootTypes.indexOf(type) > -1;
+    };
+
     CodeEditorWidget.prototype.checkDependencies = function(desc) {
         // only dependency is the node's parent, which must be in the tree already
         var self = this;
         var depsMet = false;
-        depsMet = desc.type == self._config.rootType || self.nodes[desc.parentId];
+        depsMet = self.isRootType(desc.type) || self.nodes[desc.parentId];
         return depsMet;
     };
 
@@ -610,7 +615,7 @@ define([
         // simple function to make a node; dependencies have been met
         var self = this;
         var parentNode = self._fancyTree.getRootNode();
-        if (self.nodes[desc.parentId] && desc.type != self._config.rootType)
+        if (self.nodes[desc.parentId] && !self.isRootType(desc.type))
             parentNode = self._fancyTree.getNodeByKey(desc.parentId);
         var newChild = parentNode.addChildren({
             'title': desc.name,
