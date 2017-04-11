@@ -27,7 +27,7 @@
     "clean_up": "node ./node_modules/webgme/src/bin/clean_up.js",
     "postinstall": "bower install"
   },
-  "version": "3.0.17",
+  "version": "3.0.18",
   "peerDependencies": {
     "webgme": "^2.0.0"
   },
