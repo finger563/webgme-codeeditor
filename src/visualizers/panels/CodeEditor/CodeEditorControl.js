@@ -71,7 +71,7 @@ define(['js/Constants',
                 this.currentNodeInfo.parentId = desc.parentId;
             }
 
-            this._refreshBtnModelHierarchyUp();
+            //this._refreshBtnModelHierarchyUp();
 
             // Put new node's info into territory rules
             // TODO: Update to get depth of children to load from component config
