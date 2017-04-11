@@ -204,7 +204,7 @@ define(['js/Constants',
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorControl.prototype.destroy = function () {
         this._detachClientEventListeners();
-        this._removeToolbarItems();
+        //this._removeToolbarItems();
     };
 
     CodeEditorControl.prototype._attachClientEventListeners = function () {
@@ -218,7 +218,7 @@ define(['js/Constants',
 
     CodeEditorControl.prototype.onActivate = function () {
         this._attachClientEventListeners();
-        this._displayToolbarItems();
+        //this._displayToolbarItems();
 
         if (this.currentNodeInfo && typeof this.currentNodeInfo.id === 'string') {
             WebGMEGlobal.State.registerActiveObject(this.currentNodeInfo.id, {
@@ -229,7 +229,7 @@ define(['js/Constants',
 
     CodeEditorControl.prototype.onDeactivate = function () {
         this._detachClientEventListeners();
-        this._hideToolbarItems();
+        //this._hideToolbarItems();
     };
 
     /* * * * * * * * * * Updating the toolbar * * * * * * * * * */
