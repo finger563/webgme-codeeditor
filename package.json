@@ -36,5 +36,7 @@
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
-  "dependencies": {}
+  "dependencies": {
+    "bower": "^1.8.0"
+  }
 }
