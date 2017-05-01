@@ -667,7 +667,8 @@ define([
         var self = this;
         var self = this;
         if (desc) {
-            self.saveChanges(); // save in case we're moving and haven't saved yet
+	    // save in case we're moving and haven't saved yet
+            //self.saveChanges(); 
             var depsMet = self.checkDependencies(desc);
             if (depsMet) {
                 self.createNode(desc);

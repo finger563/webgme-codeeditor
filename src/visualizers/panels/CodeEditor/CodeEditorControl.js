@@ -147,7 +147,7 @@ define(['js/Constants',
                 objDescriptor.iconPath = '/assets/DecoratorSVG/' + iconPath;
             objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
-            if (objDescriptor.type != self._config.rootType) {
+            if (self._config.rootTypes.indexOf(objDescriptor.type) == -1) {
                 // load parent until we get to rootType
                 self._selfPatterns[objDescriptor.parentId] = {children: self._config.loadDepth};
                 self._client.updateTerritory(self._territoryId, self._selfPatterns);
