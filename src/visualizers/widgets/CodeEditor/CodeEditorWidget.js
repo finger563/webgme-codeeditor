@@ -585,9 +585,10 @@ define([
         //console.log('Widget is resizing...');
     };
 
-    CodeEditorWidget.prototype.isRootType(type) {
+    CodeEditorWidget.prototype.isRootType = function(type) {
 	var self = this;
-	return self._config.rootTypes.indexOf(type) > -1;
+	var isRoot = self._config.rootTypes.indexOf(type) > -1;
+	return isRoot;
     };
 
     CodeEditorWidget.prototype.checkDependencies = function(desc) {
