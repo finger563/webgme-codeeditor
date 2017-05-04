@@ -329,7 +329,7 @@ define([
         this._left = this._el.find('#codeEditorLeft');
         this._right = this._el.find('#codeEditorRight');
 
-        this._left.css('width', '18%');
+        this._left.css('width', '19.5%');
         this._right.css('width', '80%');
 
         this.isDragging = false;
@@ -358,14 +358,13 @@ define([
                     //var selector = self._fullScreen ? self._containerTag : '.ui-layout-pane-center';
 		}
                 var maxWidth = selector.width();
-                var handleWidth = $('#codeEditorHandle').width();
-                var handlePercent = handleWidth / maxWidth * 100;
+                var handlePercent = 0.5;
                 var minX = 0;
                 var maxX = selector.width() + minX;
                 var leftWidth = mousePosX - minX;
-                var leftPercent = Math.max(10, Math.ceil((leftWidth - handleWidth/2) / maxWidth * 100));
-                var rightPercent = Math.max(10, Math.ceil(100 - leftPercent - handlePercent));
-                leftPercent = Math.floor(100 - rightPercent - handlePercent);
+                var leftPercent = Math.max(10, (leftWidth / maxWidth) * 100);
+                var rightPercent = Math.max(10, 100 - leftPercent - handlePercent);
+                leftPercent = 100 - rightPercent - handlePercent;
                 self._left.css('width', leftPercent + '%');
                 self._right.css('width', rightPercent + '%');
             }

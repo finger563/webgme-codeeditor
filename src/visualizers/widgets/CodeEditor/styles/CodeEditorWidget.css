@@ -13,9 +13,13 @@
     height: 100%;
 }
 
+#codeEditorHandle {
+    width: 0.5%;
+}
+
 #codeEditorLeft, #codeEditorRight {
     float:left;
     height:100%;
-    width:48%;
+    width:49.75%;
 }
 
