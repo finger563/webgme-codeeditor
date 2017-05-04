@@ -290,6 +290,9 @@ define([
 
         this._activeInfo = {};
 
+	// make sure any resizing gets properly propagated
+	this._el.resize(this.onWidgetContainerResize);
+
         // Create the CodeEditor and options
         this._readOnly = this._client.isProjectReadOnly();
         this._fullscreen = false;
@@ -588,6 +591,7 @@ define([
     };
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
+	this.editor.refresh();
         //console.log('Widget is resizing...');
     };
 
