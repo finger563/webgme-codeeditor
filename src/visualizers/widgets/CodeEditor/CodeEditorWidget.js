@@ -14,7 +14,9 @@ define([
     // fancy tree
     //'fancytree/jquery.fancytree-all.min',
     // Codemirror
-    './bower_components/codemirror/lib/codemirror', 
+    './bower_components/codemirror/lib/codemirror',
+    // Scrolling
+    './bower_components/codemirror/addon/scroll/simplescrollbars',
     // Syntax highlighting
     './bower_components/codemirror/mode/clike/clike',
     './bower_components/codemirror/mode/markdown/markdown',
@@ -90,6 +92,7 @@ define([
     // CSS
     // codeEditorWidget
     'css!./styles/CodeEditorWidget.css',
+    'css!./bower_components/codemirror/addon/scroll/simplescrollbars.css',
     'css!./bower_components/codemirror/lib/codemirror.css',
     'css!./bower_components/codemirror/addon/lint/lint.css',
     'css!./bower_components/codemirror/addon/hint/show-hint.css',
@@ -149,6 +152,8 @@ define([
     // fancytree,
     // CodeMirror
     CodeMirror,
+    // Scrolling
+    CodeMirrorScrolling,
     // Syntax Highlighting
     CodeMirrorModeClike,
     CodeMirrorModeMarkdown,
@@ -341,6 +346,7 @@ define([
         });
         this._container.mouseup(function() {
             self.isDragging = false;
+            self.editor.refresh();
         }).mousemove(function(e) {
             if (self.isDragging) {
                 var selector = $(self._el).find(self._containerTag);
@@ -380,6 +386,7 @@ define([
             readOnly: this._readOnly,
             lineNumbers: true,
             matchBrackets: true,
+            scrollbarStyle: "simple",
             lint: false,
             //viewPortMargin: Infinity,
             keyMap: this._config.keyBinding,
