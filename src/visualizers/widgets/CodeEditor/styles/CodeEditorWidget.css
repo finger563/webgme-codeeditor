@@ -13,6 +13,10 @@
     height: 100%;
 }
 
+.CodeMirror-scrollbar-filler {
+    display: none;
+}
+
 #codeEditorHandle {
     width: 0.5%;
 }
