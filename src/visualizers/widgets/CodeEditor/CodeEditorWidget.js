@@ -118,7 +118,7 @@ define([
     'css!./bower_components/codemirror/theme/icecoder.css',
     'css!./bower_components/codemirror/theme/isotope.css',
     'css!./bower_components/codemirror/theme/lesser-dark.css',
-    'css!./bower_components/codemirror/theme/liquibyte.css',
+    //'css!./bower_components/codemirror/theme/liquibyte.css',
     'css!./bower_components/codemirror/theme/material.css',
     'css!./bower_components/codemirror/theme/mbo.css',
     'css!./bower_components/codemirror/theme/mdn-like.css',
