@@ -520,11 +520,13 @@ define([
             retData.gmeId = gmeId;
             retData.attributes = {};
             var children = parentNode.getChildren();
-            children.map(function(child) {
-                retData.attributes[child.title] = {
-                    'node': child
-                };
-            });
+	    if (children) {
+		children.map(function(child) {
+                    retData.attributes[child.title] = {
+			'node': child
+                    };
+		});
+	    }
         }
         return retData;
     };
