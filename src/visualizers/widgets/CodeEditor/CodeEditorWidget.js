@@ -628,6 +628,8 @@ define([
         var parentNode = self._fancyTree.getRootNode();
         if (self.nodes[desc.parentId] && !self.isRootType(desc.type))
             parentNode = self._fancyTree.getNodeByKey(desc.parentId);
+	if (!parentNode) // shouldn't happen!
+	    return;
         var newChild = parentNode.addChildren({
             'title': desc.name,
             'tooltip': desc.type,
