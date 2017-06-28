@@ -33,17 +33,68 @@ Note: for `mode` documentation, see
 
 ## Adding the CodeEditor as a WebGME Component to your Project
 
-To add the CodeEditor to your WebGME deployment, simply run:
+Install instructions are below, after which you simply have to enable 
+the `CodeEditor Visualizer` as a valid visualizer in the META of the nodes 
+you wish it to be active on.
+
+### Installing With WebGME-CLI
+
+To add the CodeEditor to your WebGME deployment, simply use the `webgme-cli` to install it:
 
 ``` bash
-npm install --save webgme-codeeditor
+webgme import viz CodeEditor webgme-codeeditor
 ```
 
 Which will install the CodeEditor and then use `bower` to install the
 CodeMirror and other dependencies.
 
-Then you simply have to enable the `CodeEditor Visualizer` as a valid
-visualizer in the META of the nodes you wish it to be active on.
+### Installing With NPM
+
+You can also use npm to install it by running:
+
+```bash
+npm install --save webgme-codeeditor
+```
+
+You will need to inform webgme where to load the CodeEditor from, by editing
+the `config/config.webgme.js` to have:
+
+```json
+config.requirejsPaths = {
+  'panels/CodeEditor': './node_modules/webgme-codeeditor/src/visualizers/panels/CodeEditor',
+  'widgets/CodeEditor': './node_modules/webgme-codeeditor/src/visualizers/widgets/CodeEditor'
+};
+```
+
+added to your `config.requirejsPaths`.
+
+You will also need to tell WebGME that it is a visualizer, by adding it your 'src/visualizers/Visualizers.json`:
+
+```json
+  {
+    "id": "CodeEditor",
+    "title": "CodeEditor",
+    "panel": "panels/CodeEditor/CodeEditorPanel",
+    "DEBUG_ONLY": false
+  }
+```
+
+Finally you will need to add it to your `webgme-setup.json`:
+
+```json
+  "dependencies": {
+    "visualizers": {
+      "CodeEditor": {
+        "src": "panels/CodeEditor/CodeEditorPanel",
+        "title": "CodeEditor",
+        "panel": "src/visualizers/panels/CodeEditor",
+        "secondary": false,
+        "widget": "src/visualizers/widgets/CodeEditor",
+        "project": "webgme-codeeditor"
+      }
+    },
+```
+
 
 ## Configuring the CodeEditor for your Project / Domain
 
