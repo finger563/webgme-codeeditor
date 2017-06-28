@@ -260,7 +260,9 @@ define([
     CodeEditorWidget.getDefaultConfig = function () {
         return {
             'theme': 'default',
+	    'enableThemeSelection': true,
             'keyBinding': 'sublime',
+	    'enableKeybindingSelection': true,
             'defaultSyntax': 'cpp',
             'syntaxToModeMap': {},
             'rootTypes': [],
@@ -283,7 +285,22 @@ define([
             self = this;
 
         this._config = CodeEditorWidget.getDefaultConfig();
-        ComponentSettings.resolveWithWebGMEGlobal(this._config, CodeEditorWidget.getComponentId());
+	var compId = CodeEditorWidget.getComponentId();
+	if (typeof WebGMEGlobal !== 'undefined') {
+	    var deploymentSettings = WebGMEGlobal.componentSettings &&
+		WebGMEGlobal.componentSettings[ compId ];
+	    var userSettings       = WebGMEGlobal.userInfo && WebGMEGlobal.userInfo.settings &&
+		WebGMEGlobal.userInfo.settings[ compId ];
+	    this._config = ComponentSettings.resolveSettings( this._config, deploymentSettings );
+	    // update what is saved for the user
+	    if (this._config.enableThemeSelection) {
+		this._config.theme = userSettings && userSettings.theme;
+	    }
+	    if (this._config.enableKeybindingSelection) {
+		this._config.keyBinding = userSettings && userSettings.keyBinding;
+	    }
+            //ComponentSettings.resolveWithWebGMEGlobal(this._config, CodeEditorWidget.getComponentId());
+	}
 
         // set widget class
         //this._el.addClass(WIDGET_CLASS);
@@ -423,14 +440,18 @@ define([
 
         this.editor.foldCode(CodeMirror.Pos(0, 0));
         // THEME SELECT
-        this.theme_select = this._el.find("#theme_select").first();
-        $(this.theme_select).val(this._config.theme);
-        this.theme_select.on('change', this.selectTheme.bind(this));
+	if (this._config.enableThemeSelection) {
+            this.theme_select = this._el.find("#theme_select").first();
+            $(this.theme_select).val(this._config.theme);
+            this.theme_select.on('change', this.selectTheme.bind(this));
+	}
 
         // KEY MAP SELECTION
-        this.kb_select = this._el.find("#kb_select").first();
-        $(this.kb_select).val(this._config.keyBinding);
-        this.kb_select.on('change', this.selectKeyBinding.bind(this));
+	if (this._config.enableKeybindingSelection) {
+            this.kb_select = this._el.find("#kb_select").first();
+            $(this.kb_select).val(this._config.keyBinding);
+            this.kb_select.on('change', this.selectKeyBinding.bind(this));
+	}
 
         $(this._el).find('.CodeMirror').css({
             height: cmPercent

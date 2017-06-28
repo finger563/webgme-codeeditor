@@ -67,7 +67,9 @@ This configuration can be found in
 {
     "CodeEditor": {
 	"theme": "default",
+	"enableThemeSelection": true,
 	"keyBinding": "sublime",
+	"enableKeybindingSelection": true,
     "autoSaveInterval": "2000",
 	"defaultSyntax": "gfm",
 	"rootTypes": ["Project"],
