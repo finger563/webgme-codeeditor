@@ -61,8 +61,8 @@ the `config/config.webgme.js` to have:
 
 ```json
 config.requirejsPaths = {
-  'panels/CodeEditor': './node_modules/webgme-codeeditor/src/visualizers/panels/CodeEditor',
-  'widgets/CodeEditor': './node_modules/webgme-codeeditor/src/visualizers/widgets/CodeEditor'
+  "panels/CodeEditor": "./node_modules/webgme-codeeditor/src/visualizers/panels/CodeEditor",
+  "widgets/CodeEditor": "./node_modules/webgme-codeeditor/src/visualizers/widgets/CodeEditor"
 };
 ```
 
