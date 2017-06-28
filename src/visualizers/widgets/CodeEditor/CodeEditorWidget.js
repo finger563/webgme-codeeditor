@@ -11,6 +11,8 @@ define([
     'js/Utils/ComponentSettings',
     // HTML
     'text!./CodeEditor.html',
+    'text!./ThemeSelector.html',
+    'text!./KeybindingSelector.html',
     // fancy tree
     //'fancytree/jquery.fancytree-all.min',
     // Codemirror
@@ -148,6 +150,8 @@ define([
 ], function (
     ComponentSettings,
     CodeEditorHtml,
+    ThemeSelectorHtml,
+    KeybindingSelectorHtml,
     // fancytree
     // fancytree,
     // CodeMirror
@@ -439,8 +443,11 @@ define([
         });
 
         this.editor.foldCode(CodeMirror.Pos(0, 0));
+
+	this._selectors = $(this._el).find('#codeEditorSelectors').first();
         // THEME SELECT
 	if (this._config.enableThemeSelection) {
+	    this._selectors.append( ThemeSelectorHtml );
             this.theme_select = this._el.find("#theme_select").first();
             $(this.theme_select).val(this._config.theme);
             this.theme_select.on('change', this.selectTheme.bind(this));
@@ -448,6 +455,7 @@ define([
 
         // KEY MAP SELECTION
 	if (this._config.enableKeybindingSelection) {
+	    this._selectors.append( KeybindingSelectorHtml );
             this.kb_select = this._el.find("#kb_select").first();
             $(this.kb_select).val(this._config.keyBinding);
             this.kb_select.on('change', this.selectKeyBinding.bind(this));
