@@ -70,7 +70,7 @@ This configuration can be found in
 	"keyBinding": "sublime",
     "autoSaveInterval": "2000",
 	"defaultSyntax": "gfm",
-	"rootType": "Project",
+	"rootTypes": ["Project"],
 	"excludeTypes": ["ExcludeType"],
 	"loadDepth": 5,
 	"syntaxToModeMap": {
