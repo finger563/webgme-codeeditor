@@ -282,8 +282,6 @@ define([
     };
 
     CodeEditorWidget.prototype._initialize = function () {
-        // TODO: Update active attribute and node structure to accomodate
-        //       multiple nodes and their relation / mapping to tree
         var width = this._el.width(),
             height = this._el.height(),
             self = this;
@@ -413,9 +411,9 @@ define([
             scrollbarStyle: "simple",
             lint: false,
             //viewPortMargin: Infinity,
-            keyMap: this._config.keyBinding,
+            keyMap: this._config.keyBinding || 'sublime',
             path: './bower_components/codemirror/lib/',
-            theme: this._config.theme,
+            theme: this._config.theme || 'default',
             fullscreen: false,
             foldGutter: true,
             gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter", "CodeMirror-lint-markers"]
@@ -427,7 +425,7 @@ define([
 
         this.editor.on(
             'change',
-            _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval)
+            _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval || 1.0)
         );
 
         this.editor.setOption("extraKeys", {
