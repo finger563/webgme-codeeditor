@@ -37,3 +37,5 @@ blob-local-storage
 
 # webstorm
 .idea
+
+bower_components/
