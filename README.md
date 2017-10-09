@@ -121,6 +121,8 @@ This configuration can be found in
 	"enableThemeSelection": true,
 	"keyBinding": "sublime",
 	"enableKeybindingSelection": true,
+	"lineWrapping": false,
+	"enableLineWrappingToggle": true,
     "autoSaveInterval": "2000",
 	"defaultSyntax": "gfm",
 	"rootTypes": ["Project"],
