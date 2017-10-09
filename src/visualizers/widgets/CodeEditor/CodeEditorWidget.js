@@ -13,6 +13,7 @@ define([
     'text!./CodeEditor.html',
     'text!./ThemeSelector.html',
     'text!./KeybindingSelector.html',
+    'text!./LineWrappingToggle.html',
     // fancy tree
     //'fancytree/jquery.fancytree-all.min',
     // Codemirror
@@ -152,6 +153,7 @@ define([
     CodeEditorHtml,
     ThemeSelectorHtml,
     KeybindingSelectorHtml,
+    LineWrappingToggleHtml,
     // fancytree
     // fancytree,
     // CodeMirror
@@ -267,6 +269,8 @@ define([
 	    'enableThemeSelection': true,
             'keyBinding': 'sublime',
 	    'enableKeybindingSelection': true,
+            'lineWrapping': false,
+	    'enableLineWrappingToggle': true,
             'defaultSyntax': 'cpp',
             'syntaxToModeMap': {},
             'rootTypes': [],
@@ -300,6 +304,9 @@ define([
 	    }
 	    if (this._config.enableKeybindingSelection) {
 		this._config.keyBinding = userSettings && userSettings.keyBinding;
+	    }
+	    if (this._config.enableLineWrappingToggle) {
+		this._config.lineWrapping = userSettings && userSettings.lineWrapping;
 	    }
             //ComponentSettings.resolveWithWebGMEGlobal(this._config, CodeEditorWidget.getComponentId());
 	}
@@ -411,6 +418,7 @@ define([
             scrollbarStyle: "simple",
             lint: false,
             //viewPortMargin: Infinity,
+            lineWrapping: this._config.lineWrapping || false,
             keyMap: this._config.keyBinding || 'sublime',
             path: './bower_components/codemirror/lib/',
             theme: this._config.theme || 'default',
@@ -457,6 +465,16 @@ define([
             this.kb_select = this._el.find("#kb_select").first();
             $(this.kb_select).val(this._config.keyBinding);
             this.kb_select.on('change', this.selectKeyBinding.bind(this));
+	}
+
+	this._toggles = $(this._el).find('#codeEditorToggles').first();
+        // LINE WRAPPING TOGGLE
+	if (this._config.enableLineWrappingToggle) {
+	    this._toggles.append( LineWrappingToggleHtml );
+            this.lineWrap_toggle = this._el.find("#cbLineWrapping").first();
+            $(this.lineWrap_toggle).prop('checked', this._config.lineWrap);
+            
+            this.lineWrap_toggle.on('click', this.toggleLineWrapping.bind(this));
 	}
 
         $(this._el).find('.CodeMirror').css({
@@ -617,6 +635,17 @@ define([
         this._config.keyBinding = binding;
         this.saveConfig();
         this.editor.setOption("keyMap", binding);
+    };
+
+    CodeEditorWidget.prototype.toggleLineWrapping = function(event) {
+        var self=this;
+        //var lineWrapping = $(self.lineWrap_toggle).prop('checked');
+        var lineWrap_toggle = event.target;
+        var lineWrap = lineWrap_toggle.checked;
+
+        this._config.lineWrapping = lineWrap;
+        this.saveConfig();
+        this.editor.setOption("lineWrapping", lineWrap);
     };
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
