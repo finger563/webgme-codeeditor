@@ -472,7 +472,7 @@ define([
 	if (this._config.enableLineWrappingToggle) {
 	    this._toggles.append( LineWrappingToggleHtml );
             this.lineWrap_toggle = this._el.find("#cbLineWrapping").first();
-            $(this.lineWrap_toggle).prop('checked', this._config.lineWrap);
+            $(this.lineWrap_toggle).prop('checked', this._config.lineWrapping);
             
             this.lineWrap_toggle.on('click', this.toggleLineWrapping.bind(this));
 	}
