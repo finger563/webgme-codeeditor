@@ -111,9 +111,17 @@ define(['js/Constants',
                 'parentId': undefined,
                 'isConnection': false,
                 'iconPath': undefined,
-                'codeAttributes': {}
+                'codeAttributes': {},
+                'attributes': {}
             };
 
+            // load in all attributes the node has
+            var attrNames = nodeObj.getAttributeNames();
+            attrNames.map(function(attrName) {
+                objDescriptor.attributes[attrName] = nodeObj.getAttribute(attrName);
+            });
+
+            // load in the code attributes that were defined in the config
             var nodeMetaName = undefined;
             var baseId = nodeObj.getMetaTypeId();
             var baseObj = client.getNode(baseId);

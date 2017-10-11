@@ -14,6 +14,8 @@ define([
     'text!./ThemeSelector.html',
     'text!./KeybindingSelector.html',
     'text!./LineWrappingToggle.html',
+    // handlebars
+    './bower_components/handlebars/handlebars.min',
     // fancy tree
     //'fancytree/jquery.fancytree-all.min',
     // Codemirror
@@ -154,6 +156,8 @@ define([
     ThemeSelectorHtml,
     KeybindingSelectorHtml,
     LineWrappingToggleHtml,
+    // handlebars
+    handlebars,
     // fancytree
     // fancytree,
     // CodeMirror
@@ -277,7 +281,8 @@ define([
             'excludeTypes': [],
             'loadDepth': 5,
             'autoSaveInterval': 2000,
-            'attrToSyntaxMap': {}
+            'attrToSyntaxMap': {},
+            'nameTemplateMap': {}
         };
     };
 
@@ -680,6 +685,16 @@ define([
         });
     };
 
+    CodeEditorWidget.prototype.getNodeName = function(desc) {
+        var self = this;
+        var name = desc.name;
+        var template = self._config.nameTemplateMap && self._config.nameTemplateMap[desc.type];
+        if (template) {
+            name = handlebars.compile( template )( desc.attributes ) || name;
+        }
+        return name;
+    };
+
     CodeEditorWidget.prototype.createNode = function(desc) {
         // simple function to make a node; dependencies have been met
         var self = this;
@@ -689,7 +704,7 @@ define([
 	if (!parentNode) // shouldn't happen!
 	    return;
         var newChild = parentNode.addChildren({
-            'title': desc.name,
+            'title': self.getNodeName(desc),
             'tooltip': desc.type,
             'folder': true,
             'icon': desc.iconPath || 'glyphicon glyphicon-folder-open',
@@ -771,7 +786,7 @@ define([
             var nodeInfo = self.getNodeInfo(desc.id);
 	    if (nodeInfo.node) {
 		// make sure the title is up to date
-		nodeInfo.node.setTitle(desc.name);
+		nodeInfo.node.setTitle(self.getNodeName(desc));
 	    }
             var attributeNames = Object.keys(desc.codeAttributes);
             if (attributeNames.length > 0) {

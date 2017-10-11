@@ -117,31 +117,34 @@ This configuration can be found in
 ``` json
 {
     "CodeEditor": {
-	"theme": "default",
-	"enableThemeSelection": true,
-	"keyBinding": "sublime",
-	"enableKeybindingSelection": true,
-	"lineWrapping": false,
-	"enableLineWrappingToggle": true,
-    "autoSaveInterval": "2000",
-	"defaultSyntax": "gfm",
-	"rootTypes": ["Project"],
-	"excludeTypes": ["ExcludeType"],
-	"loadDepth": 5,
-	"syntaxToModeMap": {
-	    "gfm": {"name":"gfm", "icon": "glyphicon glyphicon-file"},
-	    "C++": {"name":"text/x-c++src", "useCPP": true},
-	    "JSON": {"name":"application/json"},
-	    "Python": {"name":"text/x-python"}
-	},
-	"attrToSyntaxMap": {
-	    "CodeObject": {
-		"Markdown": "gfm",
-		"C++": "C++",
-		"JSON": "JSON",
-		"Python": "Python"
-	    }
-	}
+	    "theme": "default",
+	    "enableThemeSelection": true,
+	    "keyBinding": "sublime",
+	    "enableKeybindingSelection": true,
+	    "lineWrapping": false,
+	    "enableLineWrappingToggle": true,
+        "autoSaveInterval": "2000",
+	    "defaultSyntax": "gfm",
+	    "rootTypes": ["Project"],
+	    "excludeTypes": ["ExcludeType"],
+	    "loadDepth": 5,
+	    "syntaxToModeMap": {
+	        "gfm": {"name":"gfm", "icon": "glyphicon glyphicon-file"},
+	        "C++": {"name":"text/x-c++src", "useCPP": true},
+	        "JSON": {"name":"application/json"},
+	        "Python": {"name":"text/x-python"}
+	    },
+	    "attrToSyntaxMap": {
+	        "CodeObject": {
+		        "Markdown": "gfm",
+  		        "C++": "C++",
+		        "JSON": "JSON",
+		        "Python": "Python"
+            }
+        },
+        "nameTemplateMap": {
+            "CodeObject": "CodeObject:{{{name}}}"
+        }
     }
 }
 ```

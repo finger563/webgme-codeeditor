@@ -24,6 +24,9 @@
 		"JSON": "JSON",
 		"Python": "Python"
 	    }
-	}
+	},
+        "nameTemplateMap": {
+            "CodeObject": "CodeObject:{{{name}}}"
+        }
     }
 }
