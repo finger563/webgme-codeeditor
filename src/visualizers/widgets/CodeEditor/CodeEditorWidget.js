@@ -9,11 +9,14 @@
 
 define([
     'js/Utils/ComponentSettings',
+    './Dialog/Dialog',
     // HTML
     'text!./CodeEditor.html',
     'text!./ThemeSelector.html',
     'text!./KeybindingSelector.html',
     'text!./LineWrappingToggle.html',
+    // showdown
+    './bower_components/showdown/dist/showdown.min',
     // handlebars
     './bower_components/handlebars/handlebars.min',
     // fancy tree
@@ -152,10 +155,14 @@ define([
     'css!./bower_components/codemirror/addon/fold/foldgutter'
 ], function (
     ComponentSettings,
+    Dialog,
+    // html
     CodeEditorHtml,
     ThemeSelectorHtml,
     KeybindingSelectorHtml,
     LineWrappingToggleHtml,
+    // showdown
+    showdown,
     // handlebars
     handlebars,
     // fancytree
@@ -282,6 +289,7 @@ define([
             'loadDepth': 5,
             'autoSaveInterval': 2000,
             'attrToSyntaxMap': {},
+            'attrToInfoMap': {},
             'nameTemplateMap': {}
         };
     };
@@ -486,6 +494,37 @@ define([
             height: cmPercent
         });
     };
+
+    /* * * * * * * * Display Functions  * * * * * * * */
+
+    CodeEditorWidget.prototype._addSplitPanelToolbarBtns = function(toolbarEl) {
+        var self = this;
+
+        // BUTTON EVENT HANDLERS
+
+        var infoEl = [
+            '<span id="information" class="split-panel-toolbar-btn fa fa-info-circle">',
+            '</span>',
+        ].join('\n');
+
+        toolbarEl.append(infoEl);
+
+        toolbarEl.find('#information').on('click', function(){
+            var d = new Dialog();
+            var activeInfo = self.getActiveInfo();
+            var markdown = self._config.attrToInfoMap &&
+                self._config.attrToInfoMap[activeInfo.parentNode.data.type] &&
+                self._config.attrToInfoMap[activeInfo.parentNode.data.type][activeInfo.attribute];
+            if (Array.isArray(markdown))
+                markdown = markdown.join('\n');
+            if (markdown) {
+                var converter = new showdown.Converter();
+                d.initialize(converter.makeHtml(markdown));
+                d.show();
+            }
+        });
+    };
+    
 
     CodeEditorWidget.prototype.fullScreen = function(toFullScreen) {
 	if (this._fullScreen == toFullScreen)
@@ -719,7 +758,7 @@ define([
             attributeNames.map(function(attributeName) {
                 // add the attributes to buffers
                 var mode = self._config.syntaxToModeMap[desc.codeAttributes[attributeName].mode] ||
-                        self._config.syntaxToModeMap[self._config.defaultSyntax];
+                    self._config.syntaxToModeMap[self._config.defaultSyntax];
                 var doc = new CodeMirror.Doc(desc.codeAttributes[attributeName].value, mode);
                 doc.__previous_value = desc.codeAttributes[attributeName].value;
 		self.docs[desc.id][attributeName] = doc;

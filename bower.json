@@ -24,6 +24,7 @@
   "dependencies": {
     "codemirror": "^5.25.0",
     "jsonlint": "^1.6.0",
-    "handlebars": "^4.0.10"
+    "handlebars": "^4.0.10",
+    "showdown": "^1.7.6"
   }
 }
