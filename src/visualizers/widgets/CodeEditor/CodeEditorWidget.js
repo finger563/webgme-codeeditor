@@ -505,7 +505,7 @@ define([
     }
 
     function makeDocSummary(docStr, summary) {
-        return '<details><summary>Show/Hide ' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
+        return '<details><summary>' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
     }
 
     CodeEditorWidget.prototype._getDocumentation = function(activeInfo) {
