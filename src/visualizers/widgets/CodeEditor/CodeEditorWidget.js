@@ -511,7 +511,8 @@ define([
     CodeEditorWidget.prototype._getDocumentation = function(activeInfo) {
         var self = this;
         var markdown = null;
-
+        var numParents = 0;
+        var p = null;
         if (activeInfo.attribute) {
             // we've clicked on an editable code attribute
             var parentInfoMap = self._config.attrToInfoMap &&
@@ -520,16 +521,31 @@ define([
                 var attrInfo = makeDocString(parentInfoMap.attributes[activeInfo.attribute]);
                 var parentInfo = makeDocString(parentInfoMap.docstring);
                 var parentSummary = activeInfo.parentNode.data.type + ' Information';
+                numParents = parentInfoMap.ancestorDepth || 0;
+                p = activeInfo.parentNode;
                 markdown = [attrInfo, makeDocSummary( parentInfo, parentSummary ) ];
             }
         }
         else {
             // we've clicked on a folder
-            var activeInfoMap = self._config.attrToInfoMap &&
+            var folderInfoMap = self._config.attrToInfoMap &&
                 self._config.attrToInfoMap[activeInfo.activeNode.data.type];
-            if (activeInfoMap) {
-                var activeInfo = makeDocString(activeInfoMap.docstring);
-                markdown = activeInfo;
+            if (folderInfoMap) {
+                var folderInfo = makeDocString(folderInfoMap.docstring);
+                numParents = folderInfoMap.ancestorDepth || 0;
+                p = activeInfo.activeNode;
+                markdown = [ folderInfo ];
+            }
+        }
+        for (var i=0; i<numParents; i++) {
+            p = p.getParent();
+            if (!p) break;
+            var parentInfoMap = self._config.attrToInfoMap &&
+                self._config.attrToInfoMap[p.data.type];
+            if (parentInfoMap) {
+                var parentInfo = makeDocString(parentInfoMap.docstring);
+                var parentSummary = p.data.type + ' Information';
+                markdown.push(makeDocSummary( parentInfo, parentSummary ) );
             }
         }
         markdown = makeDocString( markdown );
