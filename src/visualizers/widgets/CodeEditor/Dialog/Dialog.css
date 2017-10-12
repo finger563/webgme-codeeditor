@@ -1,3 +1,7 @@
-h3 {
+#information * {
+    user-select: text;
+}
+
+#page_title {
     font-size: 25px;
 }
