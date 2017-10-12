@@ -144,13 +144,21 @@ This configuration can be found in
         },
 	    "attrToInfoMap": {
 	        "CodeObject": {
-		        "Markdown": [
-                    "## Markdown Code Attribute",
-                    "This code attribute should be formatted with [Markdown](https://en.wikipedia.org/wiki/Markdown)"
+                "docstring": [
+                    "## CodeObject Documentation",
+                    "this is some documentation for the code object itself.",
+                    "",
+                    "it will be appended to the documentation for all of CodeObject's attributes."
                 ],
-		        "C++": "## C++ Code Attrubute\nThis is c++ code.\n NOTICE HOW YOU CAN USE EMBEDDED NEWLINES OR ARRAYS",
-		        "JSON": "Simple doc string here.",
-		        "Python": "Useless doc string."
+                "attributes": {
+		            "Markdown": [
+                        "## Markdown Code Attribute",
+                        "This code attribute should be formatted with [Markdown](https://en.wikipedia.org/wiki/Markdown)"
+                    ],
+                    "C++": "## C++ Code Attrubute\nThis is c++ code.\n NOTICE HOW YOU CAN USE EMBEDDED NEWLINES OR ARRAYS",
+                    "JSON": "Simple doc string here.",
+                    "Python": "Useless doc string."
+                }
             }
 	    },
         "nameTemplateMap": {

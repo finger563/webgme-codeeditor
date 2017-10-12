@@ -496,6 +496,45 @@ define([
     };
 
     /* * * * * * * * Display Functions  * * * * * * * */
+    function makeDocString(obj) {
+        var docStr = obj
+        if (Array.isArray(docStr)) {
+            docStr = docStr.join('\n');
+        }
+        return docStr;
+    }
+
+    function makeDocSummary(docStr, summary) {
+        return '<details><summary>Show/Hide ' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
+    }
+
+    CodeEditorWidget.prototype._getDocumentation = function(activeInfo) {
+        var self = this;
+        var markdown = null;
+
+        if (activeInfo.attribute) {
+            // we've clicked on an editable code attribute
+            var parentInfoMap = self._config.attrToInfoMap &&
+                self._config.attrToInfoMap[activeInfo.parentNode.data.type];
+            if (parentInfoMap) {
+                var attrInfo = makeDocString(parentInfoMap.attributes[activeInfo.attribute]);
+                var parentInfo = makeDocString(parentInfoMap.docstring);
+                var parentSummary = activeInfo.parentNode.data.type + ' Information';
+                markdown = [attrInfo, makeDocSummary( parentInfo, parentSummary ) ];
+            }
+        }
+        else {
+            // we've clicked on a folder
+            var activeInfoMap = self._config.attrToInfoMap &&
+                self._config.attrToInfoMap[activeInfo.activeNode.data.type];
+            if (activeInfoMap) {
+                var activeInfo = makeDocString(activeInfoMap.docstring);
+                markdown = activeInfo;
+            }
+        }
+        markdown = makeDocString( markdown );
+        return markdown;
+    };
 
     CodeEditorWidget.prototype._addSplitPanelToolbarBtns = function(toolbarEl) {
         var self = this;
@@ -512,11 +551,7 @@ define([
         toolbarEl.find('#information').on('click', function(){
             var d = new Dialog();
             var activeInfo = self.getActiveInfo();
-            var markdown = self._config.attrToInfoMap &&
-                self._config.attrToInfoMap[activeInfo.parentNode.data.type] &&
-                self._config.attrToInfoMap[activeInfo.parentNode.data.type][activeInfo.attribute];
-            if (Array.isArray(markdown))
-                markdown = markdown.join('\n');
+            var markdown = self._getDocumentation( activeInfo );
             if (markdown) {
                 var converter = new showdown.Converter();
                 d.initialize(converter.makeHtml(markdown));
@@ -589,13 +624,23 @@ define([
         var self = this;
         var retData = {};
         var selectedNodes = self._fancyTree.getSelectedNodes(); // should just return one
-        if (selectedNodes.length && !selectedNodes[0].isFolder()) {
-            var selectedAttribute = selectedNodes[0];
-            var selectedNode = selectedAttribute.getParent();
-            retData.activeNode = selectedAttribute;
-            retData.parentNode = selectedNode;
-            retData.gmeId = selectedNode.data.id;
-            retData.attribute = selectedAttribute.title;
+        if (selectedNodes.length) {
+            if (!selectedNodes[0].isFolder()) {
+                var selectedAttribute = selectedNodes[0];
+                var selectedNode = selectedAttribute.getParent();
+                retData.activeNode = selectedAttribute;
+                retData.parentNode = selectedNode;
+                retData.gmeId = selectedNode.data.id;
+                retData.attribute = selectedAttribute.title;
+            }
+            else {
+                var selectedNode   = selectedNodes[0];
+                var selectedParent = selectedNode.getParent();
+                retData.activeNode = selectedNode;
+                retData.parentNode = selectedParent;
+                retData.gmeId = selectedNode.data.id;
+                retData.attribute = null;
+            }
         }
         return retData;
     };
@@ -621,7 +666,7 @@ define([
     };
 
     CodeEditorWidget.prototype.getActiveDoc = function() {
-	if (this.docs[this._activeInfo.gmeId])
+	if (this.docs[this._activeInfo.gmeId] && this._activeInfo.attribute)
 	    return this.docs[this._activeInfo.gmeId][this._activeInfo.attribute];
 	return null;
     };
@@ -631,7 +676,7 @@ define([
             var value = this.editor.getValue();
             console.log('Checking for difference in: ' + this._activeInfo.attribute);
 	    var doc = this.getActiveDoc();
-            if (value != doc.__previous_value) {
+            if (doc && value != doc.__previous_value) {
                 console.log('Saving Changes to ' + this._activeInfo.gmeId + ' : ' + this._activeInfo.attribute);
                 this._client.setAttribute(this._activeInfo.gmeId, this._activeInfo.attribute, value);
                 doc.__previous_value = value;
