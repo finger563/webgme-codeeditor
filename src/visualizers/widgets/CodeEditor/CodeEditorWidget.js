@@ -923,6 +923,11 @@ define([
     CodeEditorWidget.prototype.destroy = function () {
         console.log('CodeEditorWidget:: saving when being destroyed');
         this.saveChanges();
+        this._el.remove();
+        delete this._el;
+        this._treeBrowser.remove();
+        delete this._treeBrowser;
+        delete this.editor;
     };
 
     CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
@@ -938,8 +943,8 @@ define([
     };
 
     CodeEditorWidget.prototype.onDeactivate = function () {
-        console.log('CodeEditorWidget:: saving when being deactivated');
-        this.saveChanges();
+        //console.log('CodeEditorWidget:: saving when being deactivated');
+        //this.saveChanges();
     };
 
     return CodeEditorWidget;
