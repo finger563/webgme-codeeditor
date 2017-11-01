@@ -18,8 +18,8 @@ function get_usage() {
 function get_options(prefix) {
     var options = "";
     options += prefix + '--array    (to output as an array : DEFAULT)\n';
-    options += prefix + '--string   (to output as a flat string)';
-    options += prefix +  '--help     (to display this output and exit)';
+    options += prefix + '--string   (to output as a flat string)\n';
+    options += prefix +  '--help     (to display this output and exit)\n';
     return options
 }
 
