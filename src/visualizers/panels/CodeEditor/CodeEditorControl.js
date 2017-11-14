@@ -72,7 +72,11 @@ define(['js/Constants',
                    }
 
                    // Put new node's info into territory rules
-                   self._selfPatterns[nodeId] = {children: self._config.loadDepth};  // Territory "rule"
+                   var loadDepth = self._config.loadDepth;
+                   if (loadDepth < 0) {
+                       loadDepth = 1;
+                   }
+                   self._selfPatterns[nodeId] = {children: loadDepth};  // Territory "rule"
 
                    self._territoryId = self._client.addUI(self, function (events) {
                        self._eventCallback(events);
@@ -145,9 +149,19 @@ define(['js/Constants',
 
                    if (self._config.rootTypes.indexOf(objDescriptor.type) == -1) {
                        // load parent until we get to rootType
-                       self._selfPatterns[objDescriptor.parentId] = {children: self._config.loadDepth};
-                       self._client.updateTerritory(self._territoryId, self._selfPatterns);
+                       self._selfPatterns[objDescriptor.parentId] = {children: 1};
+                       if (self._config.loadDepth < 0) {
+                           self._selfPatterns[objDescriptor.id] = {children: 1};
+                       }
                    }
+                   else {
+                       var loadDepth = self._config.loadDepth;
+                       if (loadDepth < 0) {
+                           loadDepth = 1;
+                       }
+                       self._selfPatterns[objDescriptor.parentId] = {children: loadDepth};
+                   }
+                   self._client.updateTerritory(self._territoryId, self._selfPatterns);
                }
                return objDescriptor;
            };
