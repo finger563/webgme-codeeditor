@@ -159,7 +159,7 @@ define(['js/Constants',
                        if (loadDepth < 0) {
                            loadDepth = 1;
                        }
-                       self._selfPatterns[objDescriptor.parentId] = {children: loadDepth};
+                       self._selfPatterns[objDescriptor.id] = {children: loadDepth};
                    }
                    self._client.updateTerritory(self._territoryId, self._selfPatterns);
                }
