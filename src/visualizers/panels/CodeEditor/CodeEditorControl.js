@@ -73,21 +73,24 @@ define(['js/Constants',
                    this.currentNodeInfo.parentId = undefined;
 
                    desc = this._getObjectDescriptor(nodeId);
-                   if (desc) {
+                   if (desc &&
+                       Object.keys(self._config.attrToSyntaxMap).indexOf( desc.type ) > -1 &&
+                       self._config.excludeTypes.indexOf( desc.type ) == -1
+                      ) {
                        this.currentNodeInfo.parentId = desc.parentId;
+
+                       // Put new node's info into territory rules
+                       var loadDepth = self._config.loadDepth;
+                       if (loadDepth < 0) {
+                           loadDepth = 1;
+                       }
+                       self._selfPatterns[nodeId] = {children: loadDepth};  // Territory "rule"
+
+                       self._territoryId = self._client.addUI(self, function (events) {
+                           self._eventCallback(events);
+                       });
+
                    }
-
-                   // Put new node's info into territory rules
-                   var loadDepth = self._config.loadDepth;
-                   if (loadDepth < 0) {
-                       loadDepth = 1;
-                   }
-                   self._selfPatterns[nodeId] = {children: loadDepth};  // Territory "rule"
-
-                   self._territoryId = self._client.addUI(self, function (events) {
-                       self._eventCallback(events);
-                   });
-
                    // Update the territory
                    self._client.updateTerritory(self._territoryId, self._selfPatterns);
                }
