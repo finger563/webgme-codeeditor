@@ -56,9 +56,16 @@ define(['js/Constants',
 
                self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
 
-               if (!this.currentNodeInfo.id) {
+               var widgetNode = self._widget.nodes[ nodeId ];
+               if (!self.currentNodeInfo.id || !widgetNode) {
                    // Remove current territory patterns
                    if (self._territoryId) {
+                       console.log('CodeEditorControl:: saving when changing nodes!');
+                       self._widget.saveChanges();
+                       self._widget.clearNodes();
+                       // Update the territory
+                       self._selfPatterns = {};
+                       self._client.updateTerritory(self._territoryId, self._selfPatterns);
                        self._client.removeUI(self._territoryId);
                    }
 

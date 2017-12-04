@@ -926,28 +926,40 @@ define([
         //console.log('node clicked');
     };
 
-    CodeEditorWidget.prototype.shutdown = function() {
-        this.saveChanges();
-
+    CodeEditorWidget.prototype.clearNodes = function() {
+        delete this._activeInfo;
         this._activeInfo = {};
 
+        if (this._fancyTree) {
+            var projectNode = this._fancyTree.getFirstChild();
+            if (projectNode) {
+                projectNode.remove();
+            }
+            this._fancyTree.clear();
+            this._fancyTree.render();
+        }
+
+        delete this.nodes;
+        this.nodes = {};
+    };
+
+    CodeEditorWidget.prototype.shutdown = function() {
         if (this._el) {
             this._el.remove();
             delete this._el;
         }
-
         if (this._treeBrowser) {
             this._treeBrowser.remove();
             delete this._treeBrowser;
         }
-        
         delete this.editor;
-        this.nodes = {};
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
         console.log('CodeEditorWidget:: saving when being destroyed');
+        this.saveChanges();
+        this.clearNodes();
         this.shutdown();
     };
 
@@ -965,6 +977,8 @@ define([
 
     CodeEditorWidget.prototype.onDeactivate = function () {
         console.log('CodeEditorWidget:: saving when being deactivated');
+        this.saveChanges();
+        this.clearNodes();
         this.shutdown();
     };
 
