@@ -688,7 +688,7 @@ define([
     };
 
     CodeEditorWidget.prototype.saveChanges = function() {
-        if (this._activeInfo.attribute) {
+        if (this.nodes && this._activeInfo.attribute) {
             var value = this.editor.getValue();
             console.log('Checking for difference in: ' + this._activeInfo.attribute);
 	    var doc = this.getActiveDoc();
@@ -834,7 +834,7 @@ define([
             });
             // select the first attribute
             if (desc.id == WebGMEGlobal.State.getActiveObject())
-                self._fancyTree.activateKey(desc.id + '::' + attributeNames[0]);
+                self.setActiveSelection( desc.id );
             self.editor.refresh();
             self._fancyTree.getRootNode().sortChildren(
                 function(a, b) {
@@ -846,6 +846,13 @@ define([
             self._fancyTree.render();
         }
         self.updateDependencies();
+    };
+
+    CodeEditorWidget.prototype.setActiveSelection = function(gmeId) {
+        var self = this;
+        if (self.nodes && self.nodes[ gmeId ]) {
+            self._fancyTree.activateKey( gmeId );
+        }
     };
 
     // Adding/Removing/Updating items
@@ -919,15 +926,29 @@ define([
         //console.log('node clicked');
     };
 
+    CodeEditorWidget.prototype.shutdown = function() {
+        this.saveChanges();
+
+        this._activeInfo = {};
+
+        if (this._el) {
+            this._el.remove();
+            delete this._el;
+        }
+
+        if (this._treeBrowser) {
+            this._treeBrowser.remove();
+            delete this._treeBrowser;
+        }
+        
+        delete this.editor;
+        this.nodes = {};
+    };
+
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
         console.log('CodeEditorWidget:: saving when being destroyed');
-        this.saveChanges();
-        this._el.remove();
-        delete this._el;
-        this._treeBrowser.remove();
-        delete this._treeBrowser;
-        delete this.editor;
+        this.shutdown();
     };
 
     CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
@@ -943,8 +964,8 @@ define([
     };
 
     CodeEditorWidget.prototype.onDeactivate = function () {
-        //console.log('CodeEditorWidget:: saving when being deactivated');
-        //this.saveChanges();
+        console.log('CodeEditorWidget:: saving when being deactivated');
+        this.shutdown();
     };
 
     return CodeEditorWidget;

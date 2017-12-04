@@ -56,7 +56,7 @@ define(['js/Constants',
 
                self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
 
-               if (nodeId && nodeId != this.currentNodeInfo.id) {
+               if (!this.currentNodeInfo.id) {
                    // Remove current territory patterns
                    if (self._territoryId) {
                        self._client.removeUI(self._territoryId);
@@ -66,7 +66,6 @@ define(['js/Constants',
                    this.currentNodeInfo.parentId = undefined;
 
                    desc = this._getObjectDescriptor(nodeId);
-                   nodeName = (desc && desc.name);
                    if (desc) {
                        this.currentNodeInfo.parentId = desc.parentId;
                    }
@@ -84,6 +83,10 @@ define(['js/Constants',
 
                    // Update the territory
                    self._client.updateTerritory(self._territoryId, self._selfPatterns);
+               }
+               else {
+                   // if we've already loaded the tree, try setting the selection
+                   self._widget.setActiveSelection( nodeId );
                }
            };
 
