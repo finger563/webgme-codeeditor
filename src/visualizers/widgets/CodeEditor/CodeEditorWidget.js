@@ -978,8 +978,6 @@ define([
     CodeEditorWidget.prototype.onDeactivate = function () {
         console.log('CodeEditorWidget:: saving when being deactivated');
         this.saveChanges();
-        this.clearNodes();
-        this.shutdown();
     };
 
     return CodeEditorWidget;
