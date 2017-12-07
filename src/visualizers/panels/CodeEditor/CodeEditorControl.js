@@ -57,7 +57,7 @@ define(['js/Constants',
                self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
 
                var widgetNode = self._widget.nodes[ nodeId ];
-               if (!self.currentNodeInfo.id || !widgetNode) {
+               if (!self.currentNodeInfo.id) {
                    // Remove current territory patterns
                    if (self._territoryId) {
                        console.log('CodeEditorControl:: saving when changing nodes!');
@@ -94,9 +94,9 @@ define(['js/Constants',
                    // Update the territory
                    self._client.updateTerritory(self._territoryId, self._selfPatterns);
                }
-               else {
+               else if (widgetNode) {
                    // if we've already loaded the tree, try setting the selection
-                   self._widget.setActiveSelection( nodeId );
+                   //self._widget.setActiveSelection( nodeId );
                }
            };
 
