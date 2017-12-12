@@ -798,6 +798,10 @@ define([
     CodeEditorWidget.prototype.createNode = function(desc) {
         // simple function to make a node; dependencies have been met
         var self = this;
+	if (!desc || !desc.name || !desc.type || !desc.id) {
+	    // need to make sure we don't make invalid nodes!
+	    return;
+	}
         var parentNode = self._fancyTree.getRootNode();
         if (self.nodes[desc.parentId] && !self.isRootType(desc.type))
             parentNode = self._fancyTree.getNodeByKey(desc.parentId);

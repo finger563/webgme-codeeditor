@@ -122,6 +122,10 @@ define(['js/Constants',
 
                    // load in all attributes the node has
                    var attrNames = nodeObj.getAttributeNames();
+		   if (attrNames.length == 0) {
+		       // don't want to load invalid nodes that have no attributes
+		       return null;
+		   }
                    attrNames.map(function(attrName) {
                        objDescriptor.attributes[attrName] = nodeObj.getAttribute(attrName);
                    });
@@ -144,6 +148,9 @@ define(['js/Constants',
                            });
                        }
                    }
+		   else {
+		       return null; // don't load nodes that have no base
+		   }
 
                    if (self._config.excludeTypes.indexOf(nodeMetaName) > -1) {
                        return null; // exclude these types
