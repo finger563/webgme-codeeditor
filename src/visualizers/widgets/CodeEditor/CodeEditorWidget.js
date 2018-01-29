@@ -353,7 +353,7 @@ define([
         this._fullscreen = false;
         this._el.append(CodeEditorHtml);
 
-        this._contentDiv = this._el.find('.modal-content');
+        this._contentDiv = this._el.find('.codeeditor-content');
         this._saveBtn = this._el.find('.btn-save');
         this._cancelBtn = this._el.find('.btn-cancel');
         this._compareBtn = this._el.find('.btn-compare');
@@ -594,7 +594,7 @@ define([
             $(container).find('.CodeMirror').css({
                 height: cmPercent
             });
-            this.editor.focus();
+            //this.editor.focus();
             this._fullScreen = true;
         }
         else {
@@ -612,10 +612,11 @@ define([
             $(container).find('.CodeMirror').css({
                 height: cmPercent
             });
-            this.editor.focus();
+            //this.editor.focus();
             this._fullScreen = false;
         }
         this.editor.refresh();
+        this.compareView.refresh();
     };
 
     // CODE EDITOR WIDGET
@@ -815,6 +816,15 @@ define([
         */
 
         cmEditor.setOption("extraKeys", {
+            'F11': function(cm) {
+                self.fullScreen(!self._fullScreen);
+            },
+            'Esc': function(cm) {
+                self.fullScreen(false);
+            },
+        });
+        
+        cmSaved.setOption("extraKeys", {
             'F11': function(cm) {
                 self.fullScreen(!self._fullScreen);
             },
@@ -1132,7 +1142,7 @@ define([
 	    this.editor.refresh();
         if (this.compareView)
 	    this.compareView.refresh();
-        //console.log('Widget is resizing...');
+        console.log('Widget is resizing...');
     };
 
     CodeEditorWidget.prototype.isRootType = function(type) {
