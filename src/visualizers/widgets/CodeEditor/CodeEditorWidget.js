@@ -398,6 +398,7 @@ define([
             
             if (self._stopWatching) {
                 self._stopWatching();
+                self._stopWatching = null;
             }
 
 	    self.setGMESelection();
@@ -639,6 +640,9 @@ define([
             activeObjectId,
             docId;
 
+        this.editor = null;
+        this.compareView = null;
+
         this._savedValue = params.value || '';
         this._storedValue = params.value || '';
 
@@ -799,6 +803,9 @@ define([
 
         cmEditor.setOption('mode', params.mode);
         cmSaved.setOption('mode', params.mode);
+
+        this.editor = cmEditor;
+        this.compareView = cmSaved;
 
         /*
         cmEditor.on(
@@ -1088,7 +1095,10 @@ define([
         var theme = theme_select.options[theme_select.selectedIndex].textContent;
         this._config.theme = theme;
         this.saveConfig();
-        this.editor.setOption("theme", theme);
+        if (this.editor)
+            this.editor.setOption("theme", theme);
+        if (this.compareView)
+            this.compareView.setOption("theme", theme);
     };
 
     CodeEditorWidget.prototype.selectKeyBinding = function(event) {
@@ -1097,7 +1107,10 @@ define([
         var binding = kb_select.options[kb_select.selectedIndex].textContent;
         this._config.keyBinding = binding;
         this.saveConfig();
-        this.editor.setOption("keyMap", binding);
+        if (this.editor)
+            this.editor.setOption("keyMap", binding);
+        if (this.compareView)
+            this.compareView.setOption("keyMap", binding);
     };
 
     CodeEditorWidget.prototype.toggleLineWrapping = function(event) {
@@ -1108,11 +1121,17 @@ define([
 
         this._config.lineWrapping = lineWrap;
         this.saveConfig();
-        this.editor.setOption("lineWrapping", lineWrap);
+        if (this.editor)
+            this.editor.setOption("lineWrapping", lineWrap);
+        if (this.compareView)
+            this.compareView.setOption("lineWrapping", lineWrap);
     };
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
-	//this.editor.refresh();
+        if (this.editor)
+	    this.editor.refresh();
+        if (this.compareView)
+	    this.compareView.refresh();
         //console.log('Widget is resizing...');
     };
 
@@ -1288,7 +1307,11 @@ define([
             this._treeBrowser.remove();
             delete this._treeBrowser;
         }
+        if (this._stopWatching) {
+            this._stopWatching();
+        }
         delete this.editor;
+        delete this.compareView;
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
