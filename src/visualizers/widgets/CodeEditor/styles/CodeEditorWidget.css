@@ -13,15 +13,20 @@
 /**
 * @author kecso / https://github.com/kecso
 */
-  div.code-editor-dialog .modal-content {
+div.code-editor-dialog {
+    display: table;
+}
+div.code-editor-dialog .modal-content {
+    display: table-row;
     height: 100%;
     width: 100%; }
     div.code-editor-dialog .modal-content {
       max-height: none;
-      height: 90%;
+      height: 100%;
       width: 100%;
       display: flex; }
-      div.code-editor-dialog .modal-content .compare-container {
+    div.code-editor-dialog .modal-content .compare-container {
+        margin-bottom: -30px;
         width: 100%;
         height: 100%; }
         div.code-editor-dialog .modal-content .compare-container .title-container {
@@ -60,6 +65,11 @@
               display: none; }
     div.code-editor-dialog .modal-content .modal-footer form label {
       font-weight: lighter; }
+
+    div.code-editor-dialog .modal-footer {
+        display: table-row;
+        height: 0;
+    }
 
 #codeEditorHandle {
     width: 0.5%;
