@@ -396,13 +396,16 @@ define([
             var attrName = self._activeInfo.attribute;
             var attr = gmeNode.codeAttributes[ attrName ];
             
-            if (self._stopWatching) {
-                self._stopWatching();
-                self._stopWatching = null;
-            }
-
 	    self.setGMESelection();
             if (attrName) {
+
+                if (self._stopWatching) {
+                    self._stopWatching();
+                    self._stopWatching = null;
+                }
+
+                self._activeAttributeName = null;
+
                 self._stopWatching = self.show({
                     value: attrName && attr.value,
                     name: attrName,
@@ -412,6 +415,57 @@ define([
                     mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
                         self._config.syntaxToModeMap[self._config.defaultSyntax],
                 });
+            }
+        });
+
+        // code view button handling
+        self.oked = false;
+        this._saveBtn.on('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            self.save();
+        });
+
+        this._cancelBtn.on('click', function (event) {
+            self.oked = false;
+            event.preventDefault();
+            event.stopPropagation();
+
+            self.revert();
+        });
+
+        self.comparing = false;
+        self._compareTitles.hide();
+        this._compareBtn.on('click', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            if (self.editor && self.compareView && self.diffView) {
+
+                if (self.comparing) {
+                    self._compareBtn.text('Compare');
+                    self._compareEl.addClass('not-comparing');
+                    self._compareTitles.hide();
+                    self.diffView.setShowDifferences(false);
+                } else {
+                    self._compareBtn.text('Hide Compare');
+                    self._compareEl.removeClass('not-comparing');
+                    self._compareTitles.show();
+                    self.compareView.refresh();
+                    self.diffView.setShowDifferences(true);
+                    // if (self._activeSelection.length > 1 && compareShown === false) {
+                    //     growl('More than one node were selected. Comparing with the value from [' + (nodeName ||
+                    //         self._activeSelection[0]) + '] which is the first node in the selection.', 'info', 1000);
+                    // }
+                    if (self._storedValue === self.editor.getValue()) {
+                        self.growl('There are no differences...', 'info', 1000);
+                    }
+                }
+
+                self.editor.focus();
+
+                self.comparing = !self.comparing;
             }
         });
 
@@ -621,12 +675,62 @@ define([
 
     // CODE EDITOR WIDGET
 
+    CodeEditorWidget.prototype.growl = function(msg, level, delay) {
+        $.notify({
+            icon: level === 'danger' ? 'fa fa-exclamation-triangle' : '',
+            message: msg
+        }, {
+            delay: delay,
+            hideDuration: 0,
+            type: level,
+            offset: {
+                x: 20,
+                y: 37
+            }
+        });
+    };
+
+    CodeEditorWidget.prototype.hasDifferentValue = function() {
+        var self = this;
+        return self._savedValue !== self.editor.getValue();
+    }
+
+    CodeEditorWidget.prototype.save = function() {
+        var self = this,
+            client = self._client;
+        var newValue;
+        if (!self._activeAttributeName || !self.editor || self._readOnly || self.hasDifferentValue() === false) {
+            return;
+        }
+
+        client.startTransaction();
+        newValue = self.editor.getValue();
+        self._activeSelection.forEach(function (id) {
+            client.setAttribute(id, self._activeAttributeName, newValue);
+        });
+
+        client.completeTransaction();
+
+        self._savedValue = newValue;
+    };
+
+    CodeEditorWidget.prototype.revert = function() {
+        var self = this;
+        var newValue;
+        if (!self._activeAttributeName || !self.editor || self._readOnly || self.hasDifferentValue() === false) {
+            return;
+        }
+
+        self.editor.setValue(self._storedValue);
+        if (self.comparing) {
+            self.diffView.forceUpdate();
+        }
+    };
+
     CodeEditorWidget.prototype.show = function (params) {
         var self = this,
             otherClients = {},
             territory = {},
-            comparing = false,
-            compareShown = false,
             nodeName,
             cmCompare,
             cmEditor,
@@ -636,7 +740,6 @@ define([
             uiId,
             intervalId,
             logger,
-            oked,
             client,
             activeObjectId,
             docId;
@@ -644,23 +747,10 @@ define([
         this.editor = null;
         this.compareView = null;
 
+        this._activeAttributeName = params.name;
+
         this._savedValue = params.value || '';
         this._storedValue = params.value || '';
-
-        function growl(msg, level, delay) {
-            $.notify({
-                icon: level === 'danger' ? 'fa fa-exclamation-triangle' : '',
-                message: msg
-            }, {
-                delay: delay,
-                hideDuration: 0,
-                type: level,
-                offset: {
-                    x: 20,
-                    y: 37
-                }
-            });
-        }
 
         function nodeEventHandler(events) {
             var newAttr,
@@ -675,40 +765,19 @@ define([
                     nodeObj = client.getNode(events[i].eid);
                     newAttr = nodeObj.getAttribute(params.name);
                     if (self._storedValue !== newAttr) {
-                        growl('Stored value was updated', 'info', 1000);
+                        self.growl('Stored value was updated', 'info', 1000);
                         self._storedValue = newAttr;
                         cmSaved.setValue(newAttr);
-                        if (comparing) {
+                        if (self.comparing) {
                             diffView.forceUpdate();
                         }
                     }
                 } else if (events[i].etype === 'unload') {
-                    growl('Node was deleted! Make sure to copy your text to preserve changes.', 'danger', 10000);
+                    self.growl('Node was deleted! Make sure to copy your text to preserve changes.', 'danger', 10000);
                 } else {
                     // "Technical events" not used.
                 }
             }
-        }
-
-        function hasDifferentValue() {
-            return self._savedValue !== cmEditor.getValue();
-        }
-
-        function save() {
-            var newValue;
-            if (params.readOnly || hasDifferentValue() === false) {
-                return;
-            }
-
-            client.startTransaction();
-            newValue = cmEditor.getValue();
-            self._activeSelection.forEach(function (id) {
-                client.setAttribute(id, params.name, newValue);
-            });
-
-            client.completeTransaction();
-
-            self._savedValue = newValue;
         }
 
         function isConnected(status) {
@@ -735,17 +804,17 @@ define([
                         ' seconds, the channel could be closed. You can save your changes and wait for reconnection.';
 
                     if (timeLeft >= 0) {
-                        growl(msg, 'danger', 3000);
+                        self.growl(msg, 'danger', 3000);
                     } else {
                         clearInterval(intervalId);
                     }
                 }, disconnectTimeout / 10);
             } else if (isConnected(status)) {
                 clearInterval(intervalId);
-                growl('Reconnected - all is fine.', 'success', 3000);
+                self.growl('Reconnected - all is fine.', 'success', 3000);
             } else {
                 clearInterval(intervalId);
-                growl('There were connection issues - the page needs to be refreshed. ' +
+                self.growl('There were connection issues - the page needs to be refreshed. ' +
                     'Make sure to copy any text you would like to preserve.', 'danger', 30000);
             }
         }
@@ -807,6 +876,7 @@ define([
 
         this.editor = cmEditor;
         this.compareView = cmSaved;
+        this.diffView = diffView;
 
         /*
         cmEditor.on(
@@ -841,50 +911,6 @@ define([
             }
         }
 
-        this._saveBtn.on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            save();
-        });
-
-        this._cancelBtn.on('click', function (event) {
-            oked = false;
-            event.preventDefault();
-            event.stopPropagation();
-        });
-
-        self._compareTitles.hide();
-        this._compareBtn.on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            if (comparing) {
-                self._compareBtn.text('Compare');
-                self._compareEl.addClass('not-comparing');
-                self._compareTitles.hide();
-                diffView.setShowDifferences(false);
-            } else {
-                self._compareBtn.text('Hide Compare');
-                self._compareEl.removeClass('not-comparing');
-                self._compareTitles.show();
-                cmSaved.refresh();
-                diffView.setShowDifferences(true);
-                // if (self._activeSelection.length > 1 && compareShown === false) {
-                //     growl('More than one node were selected. Comparing with the value from [' + (nodeName ||
-                //         self._activeSelection[0]) + '] which is the first node in the selection.', 'info', 1000);
-                // }
-                if (self._storedValue === cmEditor.getValue()) {
-                    growl('There are no differences...', 'info', 1000);
-                }
-                compareShown = true;
-            }
-
-            cmEditor.focus();
-
-            comparing = !comparing;
-        });
-
         var stopWatching = function() {
             var doSave = false;
 
@@ -908,11 +934,11 @@ define([
                 }
             }
 
-            if (typeof oked === 'boolean' || params.readOnly || hasDifferentValue() === false) {
-                doSave = oked;
+            if (typeof self.oked === 'boolean' || params.readOnly || self.hasDifferentValue() === false) {
+                doSave = self.oked;
                 close();
             } else {
-                growl('You made changes without saving - you cannot exit without deciding whether to save or not',
+                self.growl('You made changes without saving - you cannot exit without deciding whether to save or not',
                     'warning', 4000);
                 //e.preventDefault();
                 //e.stopImmediatePropagation();
@@ -943,7 +969,7 @@ define([
                     },
                     function atOperation(operation) {
                         otWrapper.applyOperation(operation);
-                        if (comparing) {
+                        if (self.comparing) {
                             //diffView.forceUpdate();
                         }
                     },
@@ -973,13 +999,13 @@ define([
                     function (err, initData) {
                         if (err) {
                             logger.error(err);
-                            growl(err.message, 'danger', 5000);
+                            self.growl(err.message, 'danger', 5000);
                             return;
                         }
 
                         docId = initData.docId;
                         cmEditor.setValue(initData.document);
-                        if (comparing) {
+                        if (self.comparing) {
                             diffView.forceUpdate();
                         }
 
@@ -991,7 +1017,7 @@ define([
                                     selection: otWrapper.getSelection()
                                 });
 
-                                if (comparing) {
+                                if (self.comparing) {
                                     //diffView.forceUpdate();
                                 }
                             },
