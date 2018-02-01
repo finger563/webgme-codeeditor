@@ -343,10 +343,13 @@ define([
         this._codearea = this._el.find('#codearea').first();
 
         // Tree browswer widget
+        this._treeContainer = this._el.find('#codeEditorLeft');
         this._treeBrowser = this._el.find('#codeTree');
         this._treeBrowser.fancytree({
             'checkbox': false,
             'activeVisible': true,
+            'autoScroll': true,
+            'scrollParent': self._treeContainer,
             'clickFolderMode': 3, // expand,
             'focusOnSelect': true,
             'icon': true, // make function returning icons,
