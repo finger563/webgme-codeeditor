@@ -289,6 +289,7 @@ define([
             'loadDepth': 5,
             'autoSaveInterval': 2000,
             'attrToSyntaxMap': {},
+            'defaultAttributeMap': {},
             'attrToInfoMap': {},
             'nameTemplateMap': {}
         };
@@ -858,7 +859,10 @@ define([
     CodeEditorWidget.prototype.setActiveSelection = function(gmeId) {
         var self = this;
         if (self.nodes && self.nodes[ gmeId ]) {
-            self._fancyTree.activateKey( gmeId );
+            var type = self.nodes[ gmeId ].type;
+            var defaultAttr = self._config.defaultAttributeMap[ type ];
+            var key = gmeId + ( defaultAttr ? '::' + defaultAttr : '' );
+            self._fancyTree.activateKey( key );
         }
     };
 
