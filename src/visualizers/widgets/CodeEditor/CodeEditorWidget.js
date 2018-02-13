@@ -742,6 +742,7 @@ define([
             logger,
             client,
             activeObjectId,
+            watcherId,
             docId;
 
         this.editor = null;
@@ -911,6 +912,7 @@ define([
             }
         }
 
+        var watcherData = {};
         var stopWatching = function() {
             var doSave = false;
 
@@ -923,8 +925,8 @@ define([
                     client.removeUI(uiId);
                 }
 
-                if (docId) {
-                    client.unwatchDocument({docId: docId}, function (err) {
+                if (docId && watcherId) {
+                    client.unwatchDocument({docId: docId, watcherId: watcherId}, function (err) {
                         if (err) {
                             logger.error(err);
                         }
@@ -946,7 +948,7 @@ define([
             }
         };
 
-        cmEditor.focus();
+        //cmEditor.focus();
         cmEditor.refresh();
 
         this._loader = new LoaderCircles({containerElement: this._right});
@@ -960,13 +962,15 @@ define([
                 isConnected(client.getNetworkStatus()) && this._activeSelection.length === 1) {
 
                 self._loader.start();
-                client.watchDocument({
-                        projectId: client.getActiveProjectId(),
-                        branchName: client.getActiveBranchName(),
-                        nodeId: this._activeSelection[0],
-                        attrName: params.name,
-                        attrValue: params.value,
-                    },
+                watcherData = {
+                    projectId: client.getActiveProjectId(),
+                    branchName: client.getActiveBranchName(),
+                    nodeId: this._activeSelection[0],
+                    attrName: params.name,
+                    attrValue: params.value
+                };
+                client.watchDocument(
+                    watcherData,
                     function atOperation(operation) {
                         otWrapper.applyOperation(operation);
                         if (self.comparing) {
@@ -1004,6 +1008,7 @@ define([
                         }
 
                         docId = initData.docId;
+                        watcherId = initData.watcherId;
                         cmEditor.setValue(initData.document);
                         if (self.comparing) {
                             diffView.forceUpdate();
@@ -1013,6 +1018,7 @@ define([
                             'change': function (operation) {
                                 client.sendDocumentOperation({
                                     docId: docId,
+                                    watcherId: watcherId,
                                     operation: operation,
                                     selection: otWrapper.getSelection()
                                 });
@@ -1024,6 +1030,7 @@ define([
                             'selectionChange': function () {
                                 client.sendDocumentSelection({
                                     docId: docId,
+                                    watcherId: watcherId,
                                     selection: otWrapper.getSelection()
                                 });
                             }
