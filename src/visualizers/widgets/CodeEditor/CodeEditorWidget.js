@@ -392,16 +392,28 @@ define([
             // save old buffer
             //self.saveChanges();
             // now select new buffer
+
+            // check for if the data is saved or not
+            if (self.hasDifferentValue()) {
+                alert("You have unsaved changes!\nPlease save or revert your changes before leaving.");
+                self.editor.refresh();
+                self.compareView.refresh();
+                self.diffView.forceUpdate();
+                return;
+            }
+
             var node = data.node;
             node.setActive(true);
             node.setSelected(true);
             self._activeInfo = self.getActiveInfo();
+
             var gmeNode = self.nodes[self._activeInfo.gmeId];
             var attrName = self._activeInfo.attribute;
-            var attr = gmeNode.codeAttributes[ attrName ];
             
 	    self.setGMESelection();
+
             if (attrName) {
+                var attr = gmeNode.codeAttributes[ attrName ];
 
                 if (self._stopWatching) {
                     self._stopWatching();
@@ -419,6 +431,7 @@ define([
                     mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
                         self._config.syntaxToModeMap[self._config.defaultSyntax],
                 });
+                self.diffView.forceUpdate();
             }
         });
 
@@ -696,7 +709,7 @@ define([
 
     CodeEditorWidget.prototype.hasDifferentValue = function() {
         var self = this;
-        return self._savedValue !== self.editor.getValue();
+        return self.editor && self._savedValue !== self.editor.getValue();
     }
 
     CodeEditorWidget.prototype.save = function() {
