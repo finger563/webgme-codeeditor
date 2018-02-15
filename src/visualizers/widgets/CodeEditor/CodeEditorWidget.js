@@ -863,11 +863,10 @@ define([
 
         var CodeMirrorEditorOptions = {
             value: params.value || '',
-            readOnly: params.readOnly,
+            readOnly: self._readOnly,
             origRight: params.value || '',
             showDifferences: false,
             revertButtons: true,
-            //readOnly: this._readOnly,
             lineNumbers: true,
             matchBrackets: true,
             scrollbarStyle: "simple",
@@ -953,7 +952,7 @@ define([
                 }
             }
 
-            if (typeof self.oked === 'boolean' || params.readOnly || self.hasDifferentValue() === false) {
+            if (typeof self.oked === 'boolean' || self._readOnly || self.hasDifferentValue() === false) {
                 doSave = self.oked;
                 close();
             } else {
@@ -970,7 +969,7 @@ define([
 
         this._loader = new LoaderCircles({containerElement: this._right});
 
-        if (params.readOnly) {
+        if (self._readOnly) {
             this._saveBtn.hide();
             this._compareBtn.hide();
             this._cancelBtn.hide();
