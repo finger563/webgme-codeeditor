@@ -787,7 +787,7 @@ define([
                         self._storedValue = newAttr;
                         cmSaved.setValue(newAttr);
                         if (self.comparing) {
-                            diffView.forceUpdate();
+                            self.diffView.forceUpdate();
                         }
                     }
                 } else if (events[i].etype === 'unload') {
@@ -991,7 +991,7 @@ define([
                     function atOperation(operation) {
                         otWrapper.applyOperation(operation);
                         if (self.comparing) {
-                            //diffView.forceUpdate();
+                            self.diffView.forceUpdate();
                         }
                     },
                     function atSelection(eData) {
@@ -1028,7 +1028,7 @@ define([
                         watcherId = initData.watcherId;
                         cmEditor.setValue(initData.document);
                         if (self.comparing) {
-                            diffView.forceUpdate();
+                            self.diffView.forceUpdate();
                         }
 
                         otWrapper.registerCallbacks({
@@ -1041,7 +1041,7 @@ define([
                                 });
 
                                 if (self.comparing) {
-                                    //diffView.forceUpdate();
+                                    self.diffView.forceUpdate();
                                 }
                             },
                             'selectionChange': function () {
