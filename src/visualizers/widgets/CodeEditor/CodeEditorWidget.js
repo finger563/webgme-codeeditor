@@ -461,7 +461,7 @@ define([
             if (self.editor && self.compareView && self.diffView) {
 
                 if (self.comparing) {
-                    self._compareBtn.text('Compare');
+                    self._compareBtn.text('Compare with saved value');
                     self._compareEl.addClass('not-comparing');
                     self._compareTitles.hide();
                     self.diffView.setShowDifferences(false);
