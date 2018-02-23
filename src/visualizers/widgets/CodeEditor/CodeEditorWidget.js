@@ -1379,6 +1379,9 @@ define([
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
     CodeEditorWidget.prototype.destroy = function () {
         console.log('CodeEditorWidget:: saving when being destroyed');
+        if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
+            this.save();
+        }
         //this.saveChanges();
         this.clearNodes();
         this.shutdown();
