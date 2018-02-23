@@ -388,6 +388,7 @@ define([
 
         this._stopWatching = null;
 
+        self._debouncedShow = _.debounce( self.show.bind(self), 200 );
         this._treeBrowser.on('fancytreeactivate', function(event, data) {
             // save old buffer
             //self.saveChanges();
@@ -422,16 +423,15 @@ define([
 
                 self._activeAttributeName = null;
 
-                self._stopWatching = self.show({
+                self._debouncedShow({
                     value: attrName && attr.value,
                     name: attrName,
-                    client: this._client,
+                    client: self._client,
                     activeObject: self._activeInfo.gmeId,
                     activeSelection: [self._activeInfo.gmeId],
                     mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
                         self._config.syntaxToModeMap[self._config.defaultSyntax],
                 });
-                self.diffView.forceUpdate();
             }
         });
 
@@ -1068,7 +1068,7 @@ define([
                 this._compareBtn.hide();
             }
         }
-        return stopWatching;
+        self._stopWatching = stopWatching;
     };
 
     // CODE EDITOR WIDGET    
