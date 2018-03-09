@@ -179,7 +179,7 @@ This configuration can be found in
 
 Here is an example of running the test code in this repository:
 
-![CodeEditor Test Seed Example](./img/simpleExample.png)
+![CodeEditor Test Seed Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/simpleExample.png)
 
 ### Embedded Example
 
@@ -187,7 +187,7 @@ Here is an example of the CodeEditor in a live deployment of
 [ROSMOD](https://github.com/rosmod/webgme-rosmod) on the
 [live rosmod server](http://rosmod.rcps.isis.vanderbilt.edu).
 
-![CodeEditor ROSMOD Example](./img/rosmodExample.png)
+![CodeEditor ROSMOD Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/rosmodExample.png)
 
 ### Split View Example
 
@@ -195,7 +195,7 @@ Here is a complex example of using WebGME's split-view to run two
 CodeEditor instances side-by-side to view the code at different parts
 of the model simultaneously.
 
-![CodeEditor Split View Example](./img/rosmodSplitViewExample.png)
+![CodeEditor Split View Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/rosmodSplitViewExample.png)
 
 ## Running the example in this repository
 
