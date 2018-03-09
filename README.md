@@ -10,6 +10,10 @@ WebGME collaborative web-based modeling environment
 [WebGME](https://webgme.org),
 [WebGME Github](https://github.com/webgme/webgme).
 
+Please see the [WIKI](https://github.com/finger563/webgme-codeeditor/wiki)
+for further information, including links to relevant Youtube Videos
+and specific pages about development process and such.
+
 The CodeEditor is built upon [CodeMirror](http://codemirror.net) and
 [FancyTree](https://github.com/mar10/fancytree). and provides a
 reusable way to define the different multi-line attributes for each of
@@ -28,7 +32,11 @@ Features:
 * Code Folding (depending on the text grouping in the mode
 * A tree browser for easily navigating between different attributes
   across different nodes of your WebGME project.
-* Smart autosave every time you break from typing.
+* A diff view showing the changes you've made that are not committed.
+* Collaborative simultaneous editing showing where each person is in
+  the attribute, what they've highlighted, etc.
+* Total revert capability or reverting of individual line changes
+* User configuration of line-wrapping
 * Full-screen distraction free editing mode (press `F11` when the text
   editor has focus)
 * Full interoperability with WebGME's split-panel view.
@@ -112,7 +120,8 @@ its children, up to a depth of `config.loadDepth`, while
 simultaneously looking upwards for a root node of meta-type
 `config.RootType`. Any nodes it loads whose type matches any of the
 types in `config.excludeTypes` will be discarded, along with their
-children.
+children. If you configure the `config.loadDepth` to be `-1`, the
+CodeEditor visualizer will load the full subtree.
 
 ### Example configuration
 
