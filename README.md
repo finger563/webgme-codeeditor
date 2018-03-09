@@ -23,21 +23,21 @@ e.g. `c++` or `javascript`.
 
 Features:
 
-* Syntax highlighting for all languages (modes) supported by
+* **Syntax highlighting** for all languages (modes) supported by
   CodeMirror
-* Some code completion options depending on language
-* Keybinding support for `vim`, `sublime text`, and `emacs` style
+* Some **code completion** options depending on language
+* **Keybinding** support for `vim`, `sublime text`, and `emacs` style
   keybindings, saved per user + per project
-* Editor theme-ing, saved per user + per project
-* Code Folding (depending on the text grouping in the mode
-* A tree browser for easily navigating between different attributes
+* **Editor theme-ing**, saved per user + per project
+* **Code Folding** (depending on the text grouping in the mode
+* **A tree browser** for easily navigating between different attributes
   across different nodes of your WebGME project.
-* A diff view showing the changes you've made that are not committed.
-* Collaborative simultaneous editing showing where each person is in
+* A **diff view** showing the changes you've made that are not committed.
+* Collaborative **simultaneous editing** showing where each person is in
   the attribute, what they've highlighted, etc.
-* Total revert capability or reverting of individual line changes
-* User configuration of line-wrapping
-* Full-screen distraction free editing mode (press `F11` when the text
+* Total **revert capability** or reverting of individual line changes
+* User configuration of **line-wrapping**
+* Full-screen **distraction free editing** mode (press `F11` when the text
   editor has focus)
 * Full interoperability with WebGME's split-panel view.
 
@@ -184,27 +184,7 @@ This configuration can be found in
 
 ## Examples
 
-### Simple Example
-
-Here is an example of running the test code in this repository:
-
-![CodeEditor Test Seed Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/simpleExample.png)
-
-### Embedded Example
-
-Here is an example of the CodeEditor in a live deployment of
-[ROSMOD](https://github.com/rosmod/webgme-rosmod) on the
-[live rosmod server](http://rosmod.rcps.isis.vanderbilt.edu).
-
-![CodeEditor ROSMOD Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/rosmodExample.png)
-
-### Split View Example
-
-Here is a complex example of using WebGME's split-view to run two
-CodeEditor instances side-by-side to view the code at different parts
-of the model simultaneously.
-
-![CodeEditor Split View Example](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/rosmodSplitViewExample.png)
+![Using the CodeEditor](https://raw.githubusercontent.com/wiki/finger563/webgme-codeeditor/images/code-editor-1.gif)
 
 ## Running the example in this repository
 
