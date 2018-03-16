@@ -74,7 +74,7 @@ define(['js/Constants',
 
                    desc = this._getObjectDescriptor(nodeId);
                    if (desc &&
-                       Object.keys(self._config.attrToSyntaxMap).indexOf( desc.type ) > -1 &&
+                       //Object.keys(self._config.attrToSyntaxMap).indexOf( desc.type ) > -1 &&
                        self._config.excludeTypes.indexOf( desc.type ) == -1
                       ) {
                        this.currentNodeInfo.parentId = desc.parentId;
