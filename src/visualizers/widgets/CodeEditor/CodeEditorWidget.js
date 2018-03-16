@@ -475,7 +475,7 @@ define([
                     //     growl('More than one node were selected. Comparing with the value from [' + (nodeName ||
                     //         self._activeSelection[0]) + '] which is the first node in the selection.', 'info', 1000);
                     // }
-                    if (self._storedValue === self.editor.getValue()) {
+                    if (!self.hasDifferentValue()) {
                         self.growl('There are no differences...', 'info', 1000);
                     }
                 }
@@ -709,7 +709,7 @@ define([
 
     CodeEditorWidget.prototype.hasDifferentValue = function() {
         var self = this;
-        return self.editor && self._savedValue !== self.editor.getValue();
+        return self.editor && self.compareView.getValue() !== self.editor.getValue();
     }
 
     CodeEditorWidget.prototype.save = function() {
@@ -727,8 +727,6 @@ define([
         });
 
         client.completeTransaction();
-
-        self._savedValue = newValue;
     };
 
     CodeEditorWidget.prototype.revert = function() {
@@ -738,7 +736,7 @@ define([
             return;
         }
 
-        self.editor.setValue(self._storedValue);
+        self.editor.setValue(self.compareView.getValue());
         if (self.comparing) {
             self.diffView.forceUpdate();
         }
@@ -767,7 +765,6 @@ define([
 
         this._activeAttributeName = params.name;
 
-        this._savedValue = params.value || '';
         this._storedValue = params.value || '';
 
         function nodeEventHandler(events) {
