@@ -1,6 +1,7 @@
 # webgme-codeeditor
 
 [![license](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/MIT)
+[![Documentation](https://img.shields.io/badge/documentation-wiki-blue.svg?style=flat-square)](https://github.com/finger563/webgme-codeeditor/wiki)
 [![npm](https://img.shields.io/npm/v/webgme-codeeditor.svg)](https://www.npmjs.com/package/webgme-codeeditor)
 [![npm](https://img.shields.io/npm/dm/webgme-codeeditor.svg)](https://www.npmjs.com/package/webgme-codeeditor)
 [![npm](https://img.shields.io/npm/dt/webgme-codeeditor.svg)](https://www.npmjs.com/package/webgme-codeeditor)
