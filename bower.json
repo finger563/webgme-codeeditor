@@ -1,30 +1,30 @@
 {
-  "name": "webgme-codeeditor",
-  "description": "Code Editor Visualizer for webgme using CodeMirror",
-  "main": "app.js",
-  "authors": [
-    "William Emfinger"
-  ],
-  "license": "MIT",
-  "keywords": [
-    "webgme",
-    "webgme-component",
-    "text-editor",
-    "visualizer",
-    "codemirror"
-  ],
-  "homepage": "https://github.com/finger563/webgme-codeeditor",
-  "ignore": [
-    "**/.*",
-    "node_modules",
-    "bower_components",
-    "test",
-    "tests"
-  ],
-  "dependencies": {
-    "codemirror": "^5.25.0",
-    "jsonlint": "^1.6.0",
-    "handlebars": "^4.0.10",
-    "showdown": "^1.7.6"
-  }
+    "name": "webgme-codeeditor",
+    "description": "Code Editor Visualizer for webgme using CodeMirror",
+    "main": "app.js",
+    "authors": [
+        "William Emfinger"
+    ],
+    "license": "MIT",
+    "keywords": [
+        "webgme",
+        "webgme-component",
+        "text-editor",
+        "visualizer",
+        "codemirror"
+    ],
+    "homepage": "https://github.com/finger563/webgme-codeeditor",
+    "ignore": [
+        "**/.*",
+        "node_modules",
+        "bower_components",
+        "test",
+        "tests"
+    ],
+    "dependencies": {
+        "codemirror": "components/codemirror#5.36.0",
+        "jsonlint": "zaach/jsonlint#1.6.0",
+        "handlebars": "components/handlebars.js#4.0.11",
+        "showdown": "showdownjs/showdown#1.8.6"
+    }
 }
