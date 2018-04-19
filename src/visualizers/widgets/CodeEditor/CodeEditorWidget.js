@@ -362,6 +362,18 @@ define([
         this._compareEl = this._el.find('.codemirror-compare');
         this._compareTitles = this._el.find('.title-container');
 
+
+        if (self._readOnly) {
+            this._saveBtn.hide();
+            this._compareBtn.hide();
+            this._cancelBtn.hide();
+
+
+            $(this._compareEl).css({
+                height: '100%'
+            });
+        }
+
         //this._containerTag = '.ui-layout-pane-center';
         this._containerTag = '#CODE_EDITOR_DIV';
         this._container = this._el.find(this._containerTag).first();
@@ -970,6 +982,12 @@ define([
             this._saveBtn.hide();
             this._compareBtn.hide();
             this._cancelBtn.hide();
+
+
+            $(this._compareEl).css({
+                height: '100%'
+            });
+            cmEditor.refresh();
         } else {
             if (client.gmeConfig.documentEditing.enable === true &&
                 isConnected(client.getNetworkStatus()) && this._activeSelection.length === 1) {
