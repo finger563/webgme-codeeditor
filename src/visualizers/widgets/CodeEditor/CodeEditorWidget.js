@@ -273,10 +273,6 @@ define([
         $(this._el).css({
             'padding': '0'
         });
-
-        this.nodes = {};
-	this.docs = {};
-        this.waitingNodes = {};
         this._initialize();
 
         this._logger.debug('ctor finished');
@@ -293,11 +289,11 @@ define([
     CodeEditorWidget.getDefaultConfig = function () {
         return {
             'theme': 'default',
-	    'enableThemeSelection': true,
+            'enableThemeSelection': true,
             'keyBinding': 'sublime',
-	    'enableKeybindingSelection': true,
+            'enableKeybindingSelection': true,
             'lineWrapping': false,
-	    'enableLineWrappingToggle': true,
+            'enableLineWrappingToggle': true,
             'defaultSyntax': 'cpp',
             'syntaxToModeMap': {},
             'rootTypes': [],
@@ -316,38 +312,44 @@ define([
     };
 
     CodeEditorWidget.prototype._initialize = function () {
+        this.branchChanged = false;
+
+        this.nodes = {};
+        this.docs = {};
+        this.waitingNodes = {};
+
         var width = this._el.width(),
             height = this._el.height(),
             self = this;
 
         this._config = CodeEditorWidget.getDefaultConfig();
-	var compId = CodeEditorWidget.getComponentId();
-	if (typeof WebGMEGlobal !== 'undefined') {
-	    var deploymentSettings = WebGMEGlobal.componentSettings &&
-		WebGMEGlobal.componentSettings[ compId ];
-	    var userSettings       = WebGMEGlobal.userInfo && WebGMEGlobal.userInfo.settings &&
-		WebGMEGlobal.userInfo.settings[ compId ];
-	    this._config = ComponentSettings.resolveSettings( this._config, deploymentSettings );
-	    // update what is saved for the user
-	    if (this._config.enableThemeSelection) {
-		this._config.theme = userSettings && userSettings.theme;
-	    }
-	    if (this._config.enableKeybindingSelection) {
-		this._config.keyBinding = userSettings && userSettings.keyBinding;
-	    }
-	    if (this._config.enableLineWrappingToggle) {
-		this._config.lineWrapping = userSettings && userSettings.lineWrapping;
-	    }
+        var compId = CodeEditorWidget.getComponentId();
+        if (typeof WebGMEGlobal !== 'undefined') {
+            var deploymentSettings = WebGMEGlobal.componentSettings &&
+                WebGMEGlobal.componentSettings[ compId ];
+            var userSettings       = WebGMEGlobal.userInfo && WebGMEGlobal.userInfo.settings &&
+                WebGMEGlobal.userInfo.settings[ compId ];
+            this._config = ComponentSettings.resolveSettings( this._config, deploymentSettings );
+            // update what is saved for the user
+            if (this._config.enableThemeSelection) {
+                this._config.theme = userSettings && userSettings.theme;
+            }
+            if (this._config.enableKeybindingSelection) {
+                this._config.keyBinding = userSettings && userSettings.keyBinding;
+            }
+            if (this._config.enableLineWrappingToggle) {
+                this._config.lineWrapping = userSettings && userSettings.lineWrapping;
+            }
             //ComponentSettings.resolveWithWebGMEGlobal(this._config, CodeEditorWidget.getComponentId());
-	}
+        }
 
         // set widget class
         //this._el.addClass(WIDGET_CLASS);
 
         this._activeInfo = {};
 
-	// make sure any resizing gets properly propagated
-	this._el.resize(this.onWidgetContainerResize);
+        // make sure any resizing gets properly propagated
+        this._el.resize(this.onWidgetContainerResize);
 
         // Create the CodeEditor and options
         this._readOnly = this._client.isProjectReadOnly();
@@ -400,7 +402,7 @@ define([
 
         this._stopWatching = null;
 
-        self._debouncedShow = _.debounce( self.show.bind(self), 200 );
+        self._debouncedShow = _.debounce( self.show.bind(self), 750 );
         this._treeBrowser.on('fancytreeactivate', function(event, data) {
             // save old buffer
             //self.saveChanges();
@@ -423,7 +425,7 @@ define([
             var gmeNode = self.nodes[self._activeInfo.gmeId];
             var attrName = self._activeInfo.attribute;
             
-	    self.setGMESelection();
+            self.setGMESelection();
 
             if (attrName) {
                 var attr = gmeNode.codeAttributes[ attrName ];
@@ -519,19 +521,19 @@ define([
         }).mousemove(function(e) {
             if (self.isDragging) {
                 var selector = $(self._el).find(self._containerTag);
-		var mousePosX = e.pageX;
+                var mousePosX = e.pageX;
                 if (self._fullScreen) {
-		    // now we're at the top of the document :)
-		    selector = $(document).find(self._containerTag).first();
+                    // now we're at the top of the document :)
+                    selector = $(document).find(self._containerTag).first();
                 }
-		else {
-		    // convert x position as needed
-		    // get offset from split panel
+                else {
+                    // convert x position as needed
+                    // get offset from split panel
                     mousePosX -= $(self._el).find(self._containerTag).parents('.panel-base-wh').parent().position().left;
-		    // get offset from west panel
-		    mousePosX -= $('.ui-layout-pane-center').position().left;
+                    // get offset from west panel
+                    mousePosX -= $('.ui-layout-pane-center').position().left;
                     //var selector = self._fullScreen ? self._containerTag : '.ui-layout-pane-center';
-		}
+                }
                 var maxWidth = selector.width();
                 var handlePercent = 0.5;
                 var minX = 0;
@@ -545,32 +547,32 @@ define([
             }
         });
 
-	this._selectors = $(this._el).find('#codeEditorSelectors').first();
+        this._selectors = $(this._el).find('#codeEditorSelectors').first();
         // THEME SELECT
-	if (this._config.enableThemeSelection) {
-	    this._selectors.append( ThemeSelectorHtml );
+        if (this._config.enableThemeSelection) {
+            this._selectors.append( ThemeSelectorHtml );
             this.theme_select = this._el.find("#theme_select").first();
             $(this.theme_select).val(this._config.theme);
             this.theme_select.on('change', this.selectTheme.bind(this));
-	}
+        }
 
         // KEY MAP SELECTION
-	if (this._config.enableKeybindingSelection) {
-	    this._selectors.append( KeybindingSelectorHtml );
+        if (this._config.enableKeybindingSelection) {
+            this._selectors.append( KeybindingSelectorHtml );
             this.kb_select = this._el.find("#kb_select").first();
             $(this.kb_select).val(this._config.keyBinding);
             this.kb_select.on('change', this.selectKeyBinding.bind(this));
-	}
+        }
 
-	this._toggles = $(this._el).find('#codeEditorToggles').first();
+        this._toggles = $(this._el).find('#codeEditorToggles').first();
         // LINE WRAPPING TOGGLE
-	if (this._config.enableLineWrappingToggle) {
-	    this._toggles.append( LineWrappingToggleHtml );
+        if (this._config.enableLineWrappingToggle) {
+            this._toggles.append( LineWrappingToggleHtml );
             this.lineWrap_toggle = this._el.find("#cbLineWrapping").first();
             $(this.lineWrap_toggle).prop('checked', this._config.lineWrapping);
             
             this.lineWrap_toggle.on('click', this.toggleLineWrapping.bind(this));
-	}
+        }
 
         $(this._el).find('.CodeMirror').css({
             height: cmPercent
@@ -660,8 +662,8 @@ define([
     
 
     CodeEditorWidget.prototype.fullScreen = function(toFullScreen) {
-	if (this._fullScreen == toFullScreen)
-	    return;
+        if (this._fullScreen == toFullScreen)
+            return;
         if (toFullScreen) {
             var container = $(this._el).find(this._containerTag).first();
             $(container).css({
@@ -842,7 +844,7 @@ define([
             } else {
                 clearInterval(intervalId);
                 self.growl('There were connection issues - the page needs to be refreshed. ' +
-                    'Make sure to copy any text you would like to preserve.', 'danger', 30000);
+                           'Make sure to copy any text you would like to preserve.', 'danger', 30000);
             }
         }
 
@@ -905,10 +907,10 @@ define([
         this.diffView = diffView;
 
         /*
-        cmEditor.on(
-            'change',
-            _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval || 1.0)
-        );
+          cmEditor.on(
+          'change',
+          _.debounce(this.saveChanges.bind(this), +this._config.autoSaveInterval || 1.0)
+          );
         */
 
         cmEditor.setOption("extraKeys", {
@@ -966,7 +968,7 @@ define([
                 close();
             } else {
                 self.growl('You made changes without saving - you cannot exit without deciding whether to save or not',
-                    'warning', 4000);
+                           'warning', 4000);
                 //e.preventDefault();
                 //e.stopImmediatePropagation();
                 return false;
@@ -1028,7 +1030,7 @@ define([
                         // .. and if there is a new selection, set it in the editor.
                         if (eData.selection) {
                             otherClients[eData.socketId].selection = otWrapper.setOtherSelection(eData.selection,
-                                otherClients[eData.socketId].color, otherClients[eData.socketId].userId);
+                                                                                                 otherClients[eData.socketId].color, otherClients[eData.socketId].userId);
                         }
                     },
                     function (err, initData) {
@@ -1068,8 +1070,8 @@ define([
                         });
                         self._loader.stop();
                         /*
-                        growl('A channel for close collaboration is open. Changes still have to be ' +
-                            'persisted by saving.', 'success', 5000);
+                          growl('A channel for close collaboration is open. Changes still have to be ' +
+                          'persisted by saving.', 'success', 5000);
                         */
                         client.addEventListener(client.CONSTANTS.NETWORK_STATUS_CHANGED, newNetworkStatus);
                     });
@@ -1089,20 +1091,24 @@ define([
     // CODE EDITOR WIDGET    
 
     CodeEditorWidget.prototype.setGMESelection = function() {
-	var self = this;
-	var selId = null;
-	var selectedTreeNodes = self._fancyTree.getSelectedNodes();
-	if (selectedTreeNodes.length) {
-	    var selNode = selectedTreeNodes[0]; // should just be one
-	    if (selNode.isFolder()) { // not a code attribute but an actual webGME node
-		selId = selNode.data.id;
-	    }
-	    else { // code attribute, need to get parent for real webGME node
-		selId = selNode.getParent().data.id;
-	    }
-	}
-	if (selId)
-	    WebGMEGlobal.State.registerActiveSelection([selId]);
+        var self = this;
+        var selId = null;
+        var tabId = -1;
+        var selectedTreeNodes = self._fancyTree.getSelectedNodes();
+        if (selectedTreeNodes.length) {
+            var selNode = selectedTreeNodes[0]; // should just be one
+            if (selNode.isFolder()) { // not a code attribute but an actual webGME node
+                selId = selNode.data.id;
+            }
+            else { // code attribute, need to get parent for real webGME node
+                selId = selNode.getParent().data.id;
+                tabId = selNode.getIndex();
+            }
+        }
+        if (selId) {
+            WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
+        }
+        WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
     };
 
     CodeEditorWidget.prototype.getActiveInfo = function() {
@@ -1139,13 +1145,13 @@ define([
             retData.gmeId = gmeId;
             retData.attributes = {};
             var children = parentNode.getChildren();
-	    if (children) {
-		children.map(function(child) {
+            if (children) {
+                children.map(function(child) {
                     retData.attributes[child.title] = {
-			'node': child
+                        'node': child
                     };
-		});
-	    }
+                });
+            }
         }
         return retData;
     };
@@ -1203,16 +1209,16 @@ define([
 
     CodeEditorWidget.prototype.onWidgetContainerResize = function (width, height) {
         if (this.editor)
-	    this.editor.refresh();
+            this.editor.refresh();
         if (this.compareView)
-	    this.compareView.refresh();
+            this.compareView.refresh();
         console.log('Widget is resizing...');
     };
 
     CodeEditorWidget.prototype.isRootType = function(type) {
-	var self = this;
-	var isRoot = self._config.rootTypes.indexOf(type) > -1;
-	return isRoot;
+        var self = this;
+        var isRoot = self._config.rootTypes.indexOf(type) > -1;
+        return isRoot;
     };
 
     CodeEditorWidget.prototype.checkDependencies = function(desc) {
@@ -1249,15 +1255,15 @@ define([
     CodeEditorWidget.prototype.createNode = function(desc) {
         // simple function to make a node; dependencies have been met
         var self = this;
-	if (!desc || !desc.name || !desc.type || !desc.id) {
-	    // need to make sure we don't make invalid nodes!
-	    return;
-	}
+        if (!desc || !desc.name || !desc.type || !desc.id) {
+            // need to make sure we don't make invalid nodes!
+            return;
+        }
         var parentNode = self._fancyTree.getRootNode();
         if (self.nodes[desc.parentId] && !self.isRootType(desc.type))
             parentNode = self._fancyTree.getNodeByKey(desc.parentId);
-	if (!parentNode) // shouldn't happen!
-	    return;
+        if (!parentNode) // shouldn't happen!
+            return;
         var newChild = parentNode.addChildren({
             'title': self.getNodeName(desc),
             'tooltip': desc.type,
@@ -1267,7 +1273,7 @@ define([
             'key': desc.id
         });
         self.nodes[desc.id] = desc;
-	self.docs[desc.id] = {};
+        self.docs[desc.id] = {};
         self.waitingNodes[desc.id] = undefined;
         var attributeNames = Object.keys(desc.codeAttributes);
         if (attributeNames.length > 0) {
@@ -1284,9 +1290,10 @@ define([
                     'icon': mode.icon || 'glyphicon glyphicon-edit'
                 });
             });
-            // select the first attribute
-            if (desc.id == WebGMEGlobal.State.getActiveObject())
+            if (WebGMEGlobal.State.getActiveSelection().indexOf(desc.id) > -1) {
+                // activate the node
                 self.setActiveSelection( desc.id );
+            }
             //self.editor.refresh();
             self._fancyTree.getRootNode().sortChildren(
                 function(a, b) {
@@ -1300,11 +1307,14 @@ define([
         self.updateDependencies();
     };
 
-    CodeEditorWidget.prototype.setActiveSelection = function(gmeId) {
+    CodeEditorWidget.prototype.setActiveSelection = function(gmeId, tabId) {
         var self = this;
         if (self.nodes && self.nodes[ gmeId ]) {
             var type = self.nodes[ gmeId ].type;
-            var defaultAttr = self._config.defaultAttributeMap[ type ];
+            var selectedAttributeId = (tabId > -1) ? tabId : WebGMEGlobal.State.getActiveTab();
+            var codeAttributes = Object.keys(self.nodes[ gmeId ].codeAttributes).sort();
+            var selectedAttribute = selectedAttributeId && codeAttributes[ selectedAttributeId ];
+            var defaultAttr = selectedAttribute || self._config.defaultAttributeMap[ type ];
             var key = gmeId + ( defaultAttr ? '::' + defaultAttr : '' );
             self._fancyTree.activateKey( key );
         }
@@ -1315,7 +1325,7 @@ define([
         var self = this;
         var self = this;
         if (desc) {
-	    // save in case we're moving and haven't saved yet
+            // save in case we're moving and haven't saved yet
             //self.saveChanges(); 
             var depsMet = self.checkDependencies(desc);
             if (depsMet) {
@@ -1331,6 +1341,8 @@ define([
         var self = this;
         var desc = this.nodes[gmeId];
         if(desc) {
+            // TODO: handle codemirror removal if the node removed is
+            //the one we were looking at
             //$(this._el).find('#CODE_EDITOR_DIV').first().detach();
             var treeNode = this._fancyTree.getNodeByKey(gmeId);
             if (treeNode)
@@ -1342,13 +1354,14 @@ define([
     CodeEditorWidget.prototype.updateNode = function (desc) {
         var self = this;
         if (desc) {
-	    // update the node info in our database
+            // update the node info in our database
             self.nodes[desc.id] = desc;
             var nodeInfo = self.getNodeInfo(desc.id);
-	    if (nodeInfo.node) {
-		// make sure the title is up to date
-		nodeInfo.node.setTitle(self.getNodeName(desc));
-	    }
+            // TODO: update what we're currently showing?
+            if (nodeInfo.node) {
+                // make sure the title is up to date
+                nodeInfo.node.setTitle(self.getNodeName(desc));
+            }
         }
     };
 
@@ -1392,12 +1405,104 @@ define([
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
+    CodeEditorWidget.prototype._stateActiveTabChanged = function(model, tabId, opts) {
+        let activeInfo = self.getActiveInfo();
+        var codeAttributes = Object.keys(self.nodes[ activeInfo.gmeId ].codeAttributes).sort();
+        var currentAttributeId = codeAttributes.indexOf(activeInfo.attribute);
+        if (opts.invoker !== this && tabId !== currentAttributeId) {
+            // check our current state
+            if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
+                this.save();
+            }
+            // now update the attribute we're viewing
+            this.setActiveSelection(activeInfo.gmeId, tabId);
+        }
+    };
+
+    CodeEditorWidget.prototype._stateActiveSelectionChanged = function(model, activeSelection, opts) {
+        var self = this,
+            selectedIDs = [],
+            len = activeSelection ? activeSelection.length : 0;
+
+        if (opts.invoker !== self) {
+            if (len == 1) {
+                // check our current state
+                if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
+                    this.save();
+                }
+
+                // get the node from fancytree
+                var node = self._treeBrowser.getNodeByKey(activeSelection[0]);
+                node.setActive(true);
+                node.setSelected(true);
+                self._activeInfo = self.getActiveInfo();
+
+                var gmeNode = self.nodes[self._activeInfo.gmeId];
+                var attrName = self._activeInfo.attribute;
+
+                self.setGMESelection();
+
+                if (attrName) {
+                    var attr = gmeNode.codeAttributes[ attrName ];
+
+                    if (self._stopWatching) {
+                        self._stopWatching();
+                        self._stopWatching = null;
+                    }
+
+                    self._activeAttributeName = null;
+
+                    self._debouncedShow({
+                        value: attrName && attr.value,
+                        name: attrName,
+                        client: self._client,
+                        activeObject: self._activeInfo.gmeId,
+                        activeSelection: [self._activeInfo.gmeId],
+                        mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
+                            self._config.syntaxToModeMap[self._config.defaultSyntax],
+                    });
+                }
+            }
+        }
+    };
+
+    CodeEditorWidget.prototype._branchChanged = function(args) {
+        this.branchChanged = false;
+    };
+
+    CodeEditorWidget.prototype._branchStatusChanged = function(args) {
+        if (!this.branchChanged) {
+            this.branchChanged = true;
+        }
+    };
+
+    CodeEditorWidget.prototype._attachClientEventListeners = function () {
+        this._detachClientEventListeners();
+        WebGMEGlobal.State.on('change:' + CONSTANTS.STATE_ACTIVE_TAB,
+                              this._stateActiveTabChanged, this);
+        WebGMEGlobal.State.on('change:' + CONSTANTS.STATE_ACTIVE_SELECTION,
+                              this._stateActiveSelectionChanged, this);
+        this.boundBranchChanged = this._branchChanged.bind(this);
+        this._client.addEventListener(this._client.CONSTANTS.BRANCH_CHANGED,
+                                      this.boundBranchChanged);
+        this.boundBranchStatusChanged = this._branchStatusChanged.bind(this);
+        this._client.addEventListener(this._client.CONSTANTS.BRANCH_STATUS_CHANGED,
+                                      this.boundBranchStatusChanged);
+    }
+
+    CodeEditorWidget.prototype._detachClientEventListeners = function () {
+        WebGMEGlobal.State.off('change:' + CONSTANTS.STATE_ACTIVE_SELECTION,
+                               this._stateActiveSelectionChanged, this);
+        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_CHANGED, this.boundBranchChanged);
+        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_STATUS_CHANGED, this.boundBranchStatusChanged);
+    }
+
     CodeEditorWidget.prototype.destroy = function () {
+        this._detachClientEventListeners();
         console.log('CodeEditorWidget:: saving when being destroyed');
         if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
             this.save();
         }
-        //this.saveChanges();
         this.clearNodes();
         this.shutdown();
     };
@@ -1411,12 +1516,11 @@ define([
     };
 
     CodeEditorWidget.prototype.onActivate = function () {
-        //console.log('CodeEditorWidget has been activated');
+        this._attachClientEventListeners();
     };
 
     CodeEditorWidget.prototype.onDeactivate = function () {
-        console.log('CodeEditorWidget:: saving when being deactivated');
-        //this.saveChanges();
+        this._detachClientEventListeners();
     };
 
     return CodeEditorWidget;
