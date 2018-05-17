@@ -269,10 +269,7 @@ define([
         this._logger = logger.fork('Widget');
         this._client = client;
         this._el = container;
-
-        $(this._el).css({
-            'padding': '0'
-        });
+        
         this._initialize();
 
         this._logger.debug('ctor finished');
@@ -313,6 +310,10 @@ define([
 
     CodeEditorWidget.prototype._initialize = function () {
         this.branchChanged = false;
+
+        $(this._el).css({
+            'padding': '0'
+        });
 
         this.nodes = {};
         this.docs = {};
@@ -1354,13 +1355,17 @@ define([
     CodeEditorWidget.prototype.updateNode = function (desc) {
         var self = this;
         if (desc) {
-            // update the node info in our database
-            self.nodes[desc.id] = desc;
             var nodeInfo = self.getNodeInfo(desc.id);
             // TODO: update what we're currently showing?
             if (nodeInfo.node) {
+                // update the node info in our database
+                self.nodes[desc.id] = desc;
                 // make sure the title is up to date
                 nodeInfo.node.setTitle(self.getNodeName(desc));
+            } else {
+                // we haven't seen this node before (possibly due to
+                // branch change)
+                self.addNode(desc);
             }
         }
     };
