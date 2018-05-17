@@ -1104,7 +1104,7 @@ define([
             }
         }
         if (selId) {
-            WebGMEGlobal.State.registerActiveObject(selId, {suppressVisualizerFromNode: true});
+            //WebGMEGlobal.State.registerActiveObject(selId, {suppressVisualizerFromNode: true});
             WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
         }
         WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
