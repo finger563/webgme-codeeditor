@@ -10,6 +10,7 @@
 define([
     'js/Utils/ComponentSettings',
     'js/Loader/LoaderCircles',
+    'js/Constants',
     'client/logger',
     './Dialog/Dialog',
     'webgme-ot',
@@ -164,6 +165,7 @@ define([
 ], function (
     ComponentSettings,
     LoaderCircles,
+    WebGME_CONSTANTS,
     Logger,
     Dialog,
     ot,
@@ -353,7 +355,7 @@ define([
         this._el.resize(this.onWidgetContainerResize);
 
         // Create the CodeEditor and options
-        this._readOnly = this._client.isProjectReadOnly();
+        this._readOnly = this._client.isReadOnly();
         this._fullscreen = false;
         this._el.append(CodeEditorHtml);
 
@@ -364,18 +366,6 @@ define([
         this._compareContainer = this._el.find('.compare-container');
         this._compareEl = this._el.find('.codemirror-compare');
         this._compareTitles = this._el.find('.title-container');
-
-
-        if (self._readOnly) {
-            this._saveBtn.hide();
-            this._compareBtn.hide();
-            this._cancelBtn.hide();
-
-
-            $(this._compareEl).css({
-                height: '100%'
-            });
-        }
 
         //this._containerTag = '.ui-layout-pane-center';
         this._containerTag = '#CODE_EDITOR_DIV';
@@ -404,51 +394,7 @@ define([
         this._stopWatching = null;
 
         self._debouncedShow = _.debounce( self.show.bind(self), 750 );
-        this._treeBrowser.on('fancytreeactivate', function(event, data) {
-            // save old buffer
-            //self.saveChanges();
-            // now select new buffer
-
-            // check for if the data is saved or not
-            if (self.hasDifferentValue()) {
-                alert("You have unsaved changes!\nPlease save or revert your changes before leaving.");
-                self.editor.refresh();
-                self.compareView.refresh();
-                self.diffView.forceUpdate();
-                return;
-            }
-
-            var node = data.node;
-            node.setActive(true);
-            node.setSelected(true);
-            self._activeInfo = self.getActiveInfo();
-
-            var gmeNode = self.nodes[self._activeInfo.gmeId];
-            var attrName = self._activeInfo.attribute;
-            
-            self.setGMESelection();
-
-            if (attrName) {
-                var attr = gmeNode.codeAttributes[ attrName ];
-
-                if (self._stopWatching) {
-                    self._stopWatching();
-                    self._stopWatching = null;
-                }
-
-                self._activeAttributeName = null;
-
-                self._debouncedShow({
-                    value: attrName && attr.value,
-                    name: attrName,
-                    client: self._client,
-                    activeObject: self._activeInfo.gmeId,
-                    activeSelection: [self._activeInfo.gmeId],
-                    mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
-                        self._config.syntaxToModeMap[self._config.defaultSyntax],
-                });
-            }
-        });
+        this._treeBrowser.on('fancytreeactivate', self.onFancyTreeActivate.bind(self));
 
         // code view button handling
         self.oked = false;
@@ -578,6 +524,8 @@ define([
         $(this._el).find('.CodeMirror').css({
             height: cmPercent
         });
+
+        this._attachClientEventListeners();
     };
 
     /* * * * * * * * Display Functions  * * * * * * * */
@@ -592,6 +540,25 @@ define([
     function makeDocSummary(docStr, summary) {
         return '<details><summary>' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
     }
+
+    CodeEditorWidget.prototype.updateDisplay = function() {
+        var self = this;
+        if (self._readOnly) {
+            self._saveBtn.hide();
+            self._compareBtn.hide();
+            self._cancelBtn.hide();
+            $(self._compareEl).css({
+                height: '100%'
+            });
+        } else {
+            self._saveBtn.show();
+            self._compareBtn.show();
+            self._cancelBtn.show();
+            $(self._compareEl).css({
+                height: 'calc(100% - 51px)'
+            });
+        }
+    };
 
     CodeEditorWidget.prototype._getDocumentation = function(activeInfo) {
         var self = this;
@@ -724,24 +691,32 @@ define([
 
     CodeEditorWidget.prototype.hasDifferentValue = function() {
         var self = this;
-        return self.editor && self.compareView.getValue() !== self.editor.getValue();
+        return self.editor && !self._readOnly && self.compareView.getValue() !== self.editor.getValue();
     }
 
     CodeEditorWidget.prototype.save = function() {
-        var self = this,
-            client = self._client;
-        var newValue;
-        if (!self._activeAttributeName || !self.editor || self._readOnly || self.hasDifferentValue() === false) {
-            return;
-        }
+        return new Promise((resolve, reject) => {
+            var self = this,
+                client = self._client;
+            var newValue;
+            if (!self._activeAttributeName || !self.editor || self._readOnly || self.hasDifferentValue() === false) {
+                return;
+            }
 
-        client.startTransaction();
-        newValue = self.editor.getValue();
-        self._activeSelection.forEach(function (id) {
-            client.setAttribute(id, self._activeAttributeName, newValue);
+            client.startTransaction();
+            newValue = self.editor.getValue();
+            self._activeSelection.forEach(function (id) {
+                client.setAttribute(id, self._activeAttributeName, newValue);
+            });
+
+            client.completeTransaction('', (err, result) => {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve();
+                }
+            });
         });
-
-        client.completeTransaction();
     };
 
     CodeEditorWidget.prototype.revert = function() {
@@ -794,7 +769,12 @@ define([
                 } else if (events[i].etype === 'update') {
                     nodeObj = client.getNode(events[i].eid);
                     newAttr = nodeObj.getAttribute(params.name);
-                    if (self._storedValue !== newAttr) {
+                    if (self._readOnly) {
+                        self.editor.setValue(newAttr);
+                        self.editor.refresh();
+                        self.compareView.setValue(newAttr);
+                        self.compareView.refresh();
+                    } else if (self._storedValue !== newAttr) {
                         self.growl('Stored value was updated', 'info', 1000);
                         self._storedValue = newAttr;
                         cmSaved.setValue(newAttr);
@@ -985,12 +965,52 @@ define([
             this._saveBtn.hide();
             this._compareBtn.hide();
             this._cancelBtn.hide();
-
-
             $(this._compareEl).css({
                 height: '100%'
             });
+            this.editor.refresh();
             cmEditor.refresh();
+            /*
+            if (isConnected(client.getNetworkStatus()) && this._activeSelection.length === 1) {
+
+                self._loader.start();
+                watcherData = {
+                    projectId: client.getActiveProjectId(),
+                    branchName: client.getActiveBranchName(),
+                    nodeId: this._activeSelection[0],
+                    attrName: params.name,
+                    attrValue: params.value
+                };
+                client.watchDocument(
+                    watcherData,
+                    function atOperation(operation) {
+                        console.log('got operation');
+                        console.log(operation);
+                    },
+                    function atSelection(eData) {},
+                    function cb(err, initData) {
+                        if (err) {
+                            logger.error(err);
+                            self.growl(err.message, 'danger', 5000);
+                            return;
+                        }
+
+                        docId = initData.docId;
+                        watcherId = initData.watcherId;
+                        self.editor.setValue(initData.document);
+                        self._loader.stop();
+                        client.addEventListener(client.CONSTANTS.NETWORK_STATUS_CHANGED,
+                                                newNetworkStatus);
+                    });
+            }
+            */
+            if (this._activeSelection.length === 1) {
+                territory[this._activeSelection[0]] = {children: 0};
+                uiId = client.addUI(null, nodeEventHandler);
+                client.updateTerritory(uiId, territory);
+            } else {
+                this._compareBtn.hide();
+            }
         } else {
             if (client.gmeConfig.documentEditing.enable === true &&
                 isConnected(client.getNetworkStatus()) && this._activeSelection.length === 1) {
@@ -1107,6 +1127,7 @@ define([
             }
         }
         if (selId) {
+            WebGMEGlobal.State.registerActiveObject(selId, {suppressVisualizerFromNode: true});
             WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
         }
         WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
@@ -1410,18 +1431,74 @@ define([
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
+    CodeEditorWidget.prototype.onFancyTreeActivate = function(event, data) {
+        var self = this;
+        //update readonly state here
+        self._readOnly = self._client.isReadOnly();
+        // update look
+        self.updateDisplay();
+
+        // check for if the data is saved or not
+        if (self.hasDifferentValue()) {
+            alert("You have unsaved changes!\nPlease save or revert your changes before leaving.");
+            self.editor.refresh();
+            self.compareView.refresh();
+            self.diffView.forceUpdate();
+            return;
+        }
+
+        var node = data.node;
+        node.setActive(true);
+        node.setSelected(true);
+        self._activeInfo = self.getActiveInfo();
+
+        var gmeNode = self.nodes[self._activeInfo.gmeId];
+        var attrName = self._activeInfo.attribute;
+        
+        self.setGMESelection();
+
+        if (attrName) {
+            var attr = gmeNode.codeAttributes[ attrName ];
+
+            if (self._stopWatching) {
+                self._stopWatching();
+                self._stopWatching = null;
+            }
+
+            self._activeAttributeName = null;
+
+            self._debouncedShow({
+                value: attrName && attr.value,
+                name: attrName,
+                client: self._client,
+                activeObject: self._activeInfo.gmeId,
+                activeSelection: [self._activeInfo.gmeId],
+                mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
+                    self._config.syntaxToModeMap[self._config.defaultSyntax],
+            });
+        }
+    };
+
     CodeEditorWidget.prototype._stateActiveTabChanged = function(model, tabId, opts) {
-        let activeInfo = self.getActiveInfo();
-        var codeAttributes = Object.keys(self.nodes[ activeInfo.gmeId ].codeAttributes).sort();
-        var currentAttributeId = codeAttributes.indexOf(activeInfo.attribute);
-        if (opts.invoker !== this && tabId !== currentAttributeId) {
+        let self = this,
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0];
+
+        if (opts.invoker !== this) {
             // check our current state
             if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
-                this.save();
+                this.save().then(() => {
+                    // now update the attribute we're viewing
+                    this.setActiveSelection(gmeId, tabId);
+                });
+            } else {
+                // now update the attribute we're viewing
+                this.setActiveSelection(gmeId, tabId);
             }
-            // now update the attribute we're viewing
-            this.setActiveSelection(activeInfo.gmeId, tabId);
         }
+    };
+
+    CodeEditorWidget.prototype.setReadOnly = function(isReadOnly) {
+        this._readOnly = isReadOnly;
     };
 
     CodeEditorWidget.prototype._stateActiveSelectionChanged = function(model, activeSelection, opts) {
@@ -1433,49 +1510,42 @@ define([
             if (len == 1) {
                 // check our current state
                 if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
-                    this.save();
-                }
-
-                // get the node from fancytree
-                var node = self._treeBrowser.getNodeByKey(activeSelection[0]);
-                node.setActive(true);
-                node.setSelected(true);
-                self._activeInfo = self.getActiveInfo();
-
-                var gmeNode = self.nodes[self._activeInfo.gmeId];
-                var attrName = self._activeInfo.attribute;
-
-                self.setGMESelection();
-
-                if (attrName) {
-                    var attr = gmeNode.codeAttributes[ attrName ];
-
-                    if (self._stopWatching) {
-                        self._stopWatching();
-                        self._stopWatching = null;
-                    }
-
-                    self._activeAttributeName = null;
-
-                    self._debouncedShow({
-                        value: attrName && attr.value,
-                        name: attrName,
-                        client: self._client,
-                        activeObject: self._activeInfo.gmeId,
-                        activeSelection: [self._activeInfo.gmeId],
-                        mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
-                            self._config.syntaxToModeMap[self._config.defaultSyntax],
+                    this.save().then(() => {
+                        this.setActiveSelection(activeSelection[0],
+                                                WebGMEGlobal.State.getActiveTab());
                     });
+                } else {
+                    this.setActiveSelection(activeSelection[0],
+                                            WebGMEGlobal.State.getActiveTab());
                 }
             }
         }
     };
 
     CodeEditorWidget.prototype._branchChanged = function(args) {
+        // update readonly state
+        this._readOnly = this._client.isReadOnly();
+        // redisplay
+        setTimeout(() => {
+            this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
+                                    WebGMEGlobal.State.getActiveTab());
+        }, 250);
+
         this.branchChanged = false;
     };
 
     CodeEditorWidget.prototype._branchStatusChanged = function(args) {
+        // update readonly state
+        let oldRO = this._readOnly;
+        this._readOnly = this._client.isReadOnly();
+        if (oldRO != this._readOnly) {
+            // redisplay
+            setTimeout(() => {
+                this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
+                                        WebGMEGlobal.State.getActiveTab());
+            }, 500);
+        }
+
         if (!this.branchChanged) {
             this.branchChanged = true;
         }
@@ -1483,23 +1553,34 @@ define([
 
     CodeEditorWidget.prototype._attachClientEventListeners = function () {
         this._detachClientEventListeners();
-        WebGMEGlobal.State.on('change:' + CONSTANTS.STATE_ACTIVE_TAB,
+
+        WebGMEGlobal.State.on('change:' + WebGME_CONSTANTS.STATE_ACTIVE_TAB,
                               this._stateActiveTabChanged, this);
-        WebGMEGlobal.State.on('change:' + CONSTANTS.STATE_ACTIVE_SELECTION,
+
+        WebGMEGlobal.State.on('change:' + WebGME_CONSTANTS.STATE_ACTIVE_SELECTION,
                               this._stateActiveSelectionChanged, this);
+
         this.boundBranchChanged = this._branchChanged.bind(this);
         this._client.addEventListener(this._client.CONSTANTS.BRANCH_CHANGED,
                                       this.boundBranchChanged);
+
         this.boundBranchStatusChanged = this._branchStatusChanged.bind(this);
         this._client.addEventListener(this._client.CONSTANTS.BRANCH_STATUS_CHANGED,
                                       this.boundBranchStatusChanged);
     }
 
     CodeEditorWidget.prototype._detachClientEventListeners = function () {
-        WebGMEGlobal.State.off('change:' + CONSTANTS.STATE_ACTIVE_SELECTION,
+        WebGMEGlobal.State.off('change:' + WebGME_CONSTANTS.STATE_ACTIVE_TAB,
+                              this._stateActiveTabChanged, this);
+
+        WebGMEGlobal.State.off('change:' + WebGME_CONSTANTS.STATE_ACTIVE_SELECTION,
                                this._stateActiveSelectionChanged, this);
-        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_CHANGED, this.boundBranchChanged);
-        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_STATUS_CHANGED, this.boundBranchStatusChanged);
+
+        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_CHANGED,
+                                         this.boundBranchChanged);
+
+        this._client.removeEventListener(this._client.CONSTANTS.BRANCH_STATUS_CHANGED,
+                                         this.boundBranchStatusChanged);
     }
 
     CodeEditorWidget.prototype.destroy = function () {
@@ -1512,13 +1593,16 @@ define([
         this.shutdown();
     };
 
-    CodeEditorWidget.prototype.onSelectionChanged = function(/*selectedIds*/) {
+    /*
+
+    CodeEditorWidget.prototype.onSelectionChanged = function() {
         //console.log('changed');
     };
 
     CodeEditorWidget.prototype.onUIActivity = function() {
         //console.log('UI');
     };
+    */
 
     CodeEditorWidget.prototype.onActivate = function () {
         this._attachClientEventListeners();

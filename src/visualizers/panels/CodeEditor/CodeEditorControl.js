@@ -235,6 +235,10 @@ define(['js/Constants',
            };
 
            /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
+           CodeEditorControl.prototype.setReadOnly = function(isReadOnly) {
+               this._widget.setReadOnly(isReadOnly);
+           };
+
            CodeEditorControl.prototype.destroy = function () {
                this._detachClientEventListeners();
                this._client.removeUI(this._territoryId);
