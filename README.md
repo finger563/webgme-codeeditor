@@ -198,7 +198,7 @@ your mongodb installation (you may need to create a `data` directory
 or set `--dbpath`).
 
 Then, run `npm start` from the project root to start . Finally,
-navigate to `http://localhost:8888` to start using webgme-codeeditor!
+navigate to `http://localhost:9000` to start using webgme-codeeditor!
 
 The seed project [test](./src/seeds/test.webgmex) can be used as the
 base of a project to show how the CodeEditor works.
