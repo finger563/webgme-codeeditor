@@ -418,33 +418,8 @@ define([
         this._compareBtn.on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
-
-            if (self.editor && self.compareView && self.diffView) {
-
-                if (self.comparing) {
-                    self._compareBtn.text('Compare with saved value');
-                    self._compareEl.addClass('not-comparing');
-                    self._compareTitles.hide();
-                    self.diffView.setShowDifferences(false);
-                } else {
-                    self._compareBtn.text('Hide Compare');
-                    self._compareEl.removeClass('not-comparing');
-                    self._compareTitles.show();
-                    self.compareView.refresh();
-                    self.diffView.setShowDifferences(true);
-                    // if (self._activeSelection.length > 1 && compareShown === false) {
-                    //     growl('More than one node were selected. Comparing with the value from [' + (nodeName ||
-                    //         self._activeSelection[0]) + '] which is the first node in the selection.', 'info', 1000);
-                    // }
-                    if (!self.hasDifferentValue()) {
-                        self.growl('There are no differences...', 'info', 1000);
-                    }
-                }
-
-                self.editor.focus();
-
-                self.comparing = !self.comparing;
-            }
+            self.comparing = !self.comparing;
+            self.onCompareUpdate();
         });
 
         // Split view resizing
@@ -544,6 +519,8 @@ define([
     CodeEditorWidget.prototype.updateDisplay = function() {
         var self = this;
         if (self._readOnly) {
+            self.comparing = false;
+            self.onCompareUpdate();
             self._saveBtn.hide();
             self._compareBtn.hide();
             self._cancelBtn.hide();
@@ -1431,6 +1408,32 @@ define([
     };
 
     /* * * * * * * * Visualizer life cycle callbacks * * * * * * * */
+    CodeEditorWidget.prototype.onCompareUpdate = function() {
+        var self = this;
+        if (self.editor && self.compareView && self.diffView) {
+            if (self.comparing) {
+                self._compareBtn.text('Hide Compare');
+                self._compareEl.removeClass('not-comparing');
+                self._compareTitles.show();
+                self.compareView.refresh();
+                self.diffView.setShowDifferences(true);
+                // if (self._activeSelection.length > 1 && compareShown === false) {
+                //     growl('More than one node were selected. Comparing with the value from [' + (nodeName ||
+                //         self._activeSelection[0]) + '] which is the first node in the selection.', 'info', 1000);
+                // }
+                if (!self.hasDifferentValue()) {
+                    self.growl('There are no differences...', 'info', 1000);
+                }
+            } else {
+                self._compareBtn.text('Compare with saved value');
+                self._compareEl.addClass('not-comparing');
+                self._compareTitles.hide();
+                self.diffView.setShowDifferences(false);
+            }
+            self.editor.focus();
+        }
+    };
+    
     CodeEditorWidget.prototype.onFancyTreeActivate = function(event, data) {
         var self = this;
         //update readonly state here
