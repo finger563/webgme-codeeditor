@@ -745,7 +745,7 @@ define([
                     nodeName = nodeObj.getAttribute('name');
                 } else if (events[i].etype === 'update') {
                     nodeObj = client.getNode(events[i].eid);
-                    newAttr = nodeObj.getAttribute(params.name);
+                    newAttr = nodeObj.getAttribute(params.name) || '';
                     if (self._readOnly) {
                         self.editor.setValue(newAttr);
                         self.editor.refresh();
