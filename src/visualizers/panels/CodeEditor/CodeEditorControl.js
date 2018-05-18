@@ -54,7 +54,8 @@ define(['js/Constants',
                    desc,
                    nodeName;
 
-               self._logger.debug('activeObject nodeId \'' + nodeId + '\'');
+               console.log('current nodeId \'' + self.currentNodeInfo.id + '\'');
+               console.log('activeObject nodeId \'' + nodeId + '\'');
 
                var widgetNode = self._widget.nodes[ nodeId ];
                if (!self.currentNodeInfo.id) {
@@ -73,9 +74,9 @@ define(['js/Constants',
                    this.currentNodeInfo.parentId = undefined;
 
                    desc = this._getObjectDescriptor(nodeId);
-                   if (desc &&
+                   if (desc //&&
                        //Object.keys(self._config.attrToSyntaxMap).indexOf( desc.type ) > -1 &&
-                       self._config.excludeTypes.indexOf( desc.type ) == -1
+                       //self._config.excludeTypes.indexOf( desc.type ) == -1
                       ) {
                        this.currentNodeInfo.parentId = desc.parentId;
 
@@ -96,7 +97,14 @@ define(['js/Constants',
                }
                else if (widgetNode) {
                    // if we've already loaded the tree, try setting the selection
-                   //self._widget.setActiveSelection( nodeId );
+                   self._widget.setGMESelection(nodeId);
+                   /*
+                   WebGMEGlobal.State.registerActiveSelection([nodeId]);
+                   WebGMEGlobal.State.registerActiveObject(
+                       self.currentNodeInfo.id,
+                       {suppressVisualizerFromNode: true}
+                   );
+                   */
                }
            };
 

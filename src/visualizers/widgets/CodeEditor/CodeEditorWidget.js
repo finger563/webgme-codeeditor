@@ -380,7 +380,7 @@ define([
             'activeVisible': true,
             'autoScroll': true,
             'scrollParent': self._treeContainer,
-            'clickFolderMode': 3, // expand,
+            'clickFolderMode': 4, // expand,
             'focusOnSelect': true,
             'icon': true, // make function returning icons,
             'imagePath': null, // store icons here for use,
@@ -393,7 +393,7 @@ define([
 
         this._stopWatching = null;
 
-        self._debouncedShow = _.debounce( self.show.bind(self), 750 );
+        self._debouncedShow = _.debounce( self.show.bind(self), 350 );
         this._treeBrowser.on('fancytreeactivate', self.onFancyTreeActivate.bind(self));
 
         // code view button handling
@@ -1088,26 +1088,37 @@ define([
 
     // CODE EDITOR WIDGET    
 
-    CodeEditorWidget.prototype.setGMESelection = function() {
+    CodeEditorWidget.prototype.setGMESelection = function(nodeId, attrName) {
         var self = this;
-        var selId = null;
+        var selId = nodeId;
         var tabId = -1;
-        var selectedTreeNodes = self._fancyTree.getSelectedNodes();
-        if (selectedTreeNodes.length) {
-            var selNode = selectedTreeNodes[0]; // should just be one
-            if (selNode.isFolder()) { // not a code attribute but an actual webGME node
-                selId = selNode.data.id;
+        
+        if (!selId) {
+            var selectedTreeNodes = self._fancyTree.getSelectedNodes();
+            if (selectedTreeNodes.length) {
+                var selNode = selectedTreeNodes[0]; // should just be one
+                if (selNode.isFolder()) { // not a code attribute but an actual webGME node
+                    selId = selNode.data.id;
+                }
+                else { // code attribute, need to get parent for real webGME node
+                    selId = selNode.getParent().data.id;
+                    tabId = selNode.getIndex();
+                }
+                WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
+                WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
+                WebGMEGlobal.State.registerActiveObject(
+                    selId,
+                    {suppressVisualizerFromNode: true}
+                );
             }
-            else { // code attribute, need to get parent for real webGME node
-                selId = selNode.getParent().data.id;
-                tabId = selNode.getIndex();
-            }
+        } else {
+            var node = self.nodes[ selId ];
+            var codeAttributes = Object.keys(node.codeAttributes).sort();
+            var attr = attrName || self._config.defaultAttributeMap[ node.type ];
+            tabId = codeAttributes.indexOf(attr);
+            WebGMEGlobal.State.registerActiveSelection([selId]);
+            WebGMEGlobal.State.registerActiveTab(tabId);
         }
-        if (selId) {
-            //WebGMEGlobal.State.registerActiveObject(selId, {suppressVisualizerFromNode: true});
-            WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
-        }
-        WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
     };
 
     CodeEditorWidget.prototype.getActiveInfo = function() {
