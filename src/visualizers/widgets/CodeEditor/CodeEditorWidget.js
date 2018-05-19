@@ -1222,7 +1222,7 @@ define([
             this.editor.refresh();
         if (this.compareView)
             this.compareView.refresh();
-        console.log('Widget is resizing...');
+        //console.log('Widget is resizing...');
     };
 
     CodeEditorWidget.prototype.isRootType = function(type) {
@@ -1285,7 +1285,7 @@ define([
         self.nodes[desc.id] = desc;
         self.docs[desc.id] = {};
         self.waitingNodes[desc.id] = undefined;
-        var attributeNames = Object.keys(desc.codeAttributes);
+        var attributeNames = Object.keys(desc.codeAttributes).sort();
         if (attributeNames.length > 0) {
             attributeNames.map(function(attributeName) {
                 // add the attributes to buffers
@@ -1317,8 +1317,9 @@ define([
         self.updateDependencies();
     };
 
-    CodeEditorWidget.prototype.setActiveSelection = function(gmeId, tabId) {
+    CodeEditorWidget.prototype.setActiveSelection = function(gmeId, tabId, fromWebGME) {
         var self = this;
+        self.setFromWebGME = fromWebGME;
         if (self.nodes && self.nodes[ gmeId ]) {
             var type = self.nodes[ gmeId ].type;
             var selectedAttributeId = (tabId > -1) ? tabId : WebGMEGlobal.State.getActiveTab();
@@ -1464,14 +1465,32 @@ define([
         var node = data.node;
         node.setActive(true);
         node.setSelected(true);
-        self._activeInfo = self.getActiveInfo();
 
-        var gmeNode = self.nodes[self._activeInfo.gmeId];
-        var attrName = self._activeInfo.attribute;
+        var gmeId = null;
+        var gmeNode = null;
+        var attrName = null;
         
-        self.setGMESelection();
+        if (self.setFromWebGME) {
+            self.setFromWebGME = false;
+            // get the id / node / attr from tab and selection
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0];
+            gmeNode = self.nodes[gmeId];
+            var codeAttributes = Object.keys(gmeNode.codeAttributes).sort();
+            attrName = codeAttributes[WebGMEGlobal.State.getActiveTab()];
+        } else {
+            // get the id / node / attr from the tree
+            self._activeInfo = self.getActiveInfo();
 
-        if (attrName) {
+            gmeId = self._activeInfo.gmeId;
+            gmeNode = self.nodes[gmeId];
+            attrName = self._activeInfo.attribute;
+            
+            // since we were set from the tree - inform webgme that we
+            // have a new selection
+            self.setGMESelection();
+        }
+        
+        if (attrName && gmeNode) {
             var attr = gmeNode.codeAttributes[ attrName ];
 
             if (self._stopWatching) {
@@ -1485,8 +1504,8 @@ define([
                 value: attrName && attr.value,
                 name: attrName,
                 client: self._client,
-                activeObject: self._activeInfo.gmeId,
-                activeSelection: [self._activeInfo.gmeId],
+                activeObject: gmeId,
+                activeSelection: [gmeId],
                 mode: (attrName && self._config.syntaxToModeMap[attr.mode]) ||
                     self._config.syntaxToModeMap[self._config.defaultSyntax],
             });
@@ -1502,11 +1521,11 @@ define([
             if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
                 this.save().then(() => {
                     // now update the attribute we're viewing
-                    this.setActiveSelection(gmeId, tabId);
+                    this.setActiveSelection(gmeId, tabId, true);
                 });
             } else {
                 // now update the attribute we're viewing
-                this.setActiveSelection(gmeId, tabId);
+                this.setActiveSelection(gmeId, tabId, true);
             }
         }
     };
@@ -1526,11 +1545,13 @@ define([
                 if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
                     this.save().then(() => {
                         this.setActiveSelection(activeSelection[0],
-                                                WebGMEGlobal.State.getActiveTab());
+                                                WebGMEGlobal.State.getActiveTab(),
+                                                true);
                     });
                 } else {
                     this.setActiveSelection(activeSelection[0],
-                                            WebGMEGlobal.State.getActiveTab());
+                                            WebGMEGlobal.State.getActiveTab(),
+                                            true);
                 }
             }
         }
@@ -1542,7 +1563,8 @@ define([
         // redisplay
         setTimeout(() => {
             this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
-                                    WebGMEGlobal.State.getActiveTab());
+                                    WebGMEGlobal.State.getActiveTab(),
+                                    true);
         }, 250);
 
         this.branchChanged = false;
@@ -1556,7 +1578,8 @@ define([
             // redisplay
             setTimeout(() => {
                 this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
-                                        WebGMEGlobal.State.getActiveTab());
+                                        WebGMEGlobal.State.getActiveTab(),
+                                        true);
             }, 500);
         }
 

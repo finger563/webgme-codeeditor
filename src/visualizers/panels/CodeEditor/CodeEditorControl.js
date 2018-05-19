@@ -54,11 +54,12 @@ define(['js/Constants',
                    desc,
                    nodeName;
 
-               console.log('current nodeId \'' + self.currentNodeInfo.id + '\'');
-               console.log('activeObject nodeId \'' + nodeId + '\'');
+               //console.log('current nodeId \'' + self.currentNodeInfo.id + '\'');
+               //console.log('activeObject nodeId \'' + nodeId + '\'');
 
+               desc = this._getObjectDescriptor(nodeId);
                var widgetNode = self._widget.nodes[ nodeId ];
-               if (!self.currentNodeInfo.id) {
+               if (!self.currentNodeInfo.id && desc) {
                    // Remove current territory patterns
                    if (self._territoryId) {
                        console.log('CodeEditorControl:: saving when changing nodes!');
@@ -72,8 +73,6 @@ define(['js/Constants',
 
                    this.currentNodeInfo.id = nodeId;
                    this.currentNodeInfo.parentId = undefined;
-
-                   desc = this._getObjectDescriptor(nodeId);
                    if (desc //&&
                        //Object.keys(self._config.attrToSyntaxMap).indexOf( desc.type ) > -1 &&
                        //self._config.excludeTypes.indexOf( desc.type ) == -1
@@ -97,13 +96,14 @@ define(['js/Constants',
                }
                else if (widgetNode) {
                    // if we've already loaded the tree, try setting the selection
-                   self._widget.setGMESelection(nodeId);
+                   self._widget.setActiveSelection(nodeId, WebGMEGlobal.State.getActiveTab(), false);
+                   //self._widget.setGMESelection(nodeId);
                    /*
-                   WebGMEGlobal.State.registerActiveSelection([nodeId]);
                    WebGMEGlobal.State.registerActiveObject(
-                       self.currentNodeInfo.id,
+                       nodeId,
                        {suppressVisualizerFromNode: true}
                    );
+                   WebGMEGlobal.State.registerActiveSelection([nodeId]);
                    */
                }
            };
