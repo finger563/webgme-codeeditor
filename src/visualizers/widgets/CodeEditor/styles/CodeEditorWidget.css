@@ -87,6 +87,34 @@ div.code-editor-dialog .codeeditor-footer {
     height:100%;
 }
 
+#codeEditorControls {
+    height: 85px;
+    overflow: auto;
+}
+
+.codeEditorToggle {
+    padding: 5px;
+}
+
+.codeEditorToggle input {
+    float: right;
+}
+
+.codeEditorSelector {
+    padding: 5px;
+}
+.codeEditorSelector select {
+    float: right;
+}
+
+#codeEditorScroll {
+    height: calc(100% - 85px);
+    overflow: auto;
+    border-style: solid;
+    border-color: lightgrey;
+    border-width: 1px;
+}
+
 details {
     border: 1px solid #E1E1E1;
     border-radius: 5px;

@@ -373,7 +373,7 @@ define([
         this._codearea = this._el.find('#codearea').first();
 
         // Tree browswer widget
-        this._treeContainer = this._el.find('#codeEditorLeft');
+        this._treeContainer = this._el.find('#codeEditorScroll');
         this._treeBrowser = this._el.find('#codeTree');
         this._treeBrowser.fancytree({
             'checkbox': false,
