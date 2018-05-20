@@ -469,10 +469,10 @@ define([
             }
         });
 
-        this._selectors = $(this._el).find('#codeEditorSelectors').first();
+        this._controls = $(this._el).find('#codeEditorControls').first();
         // THEME SELECT
         if (this._config.enableThemeSelection) {
-            this._selectors.append( ThemeSelectorHtml );
+            this._controls.append( ThemeSelectorHtml );
             this.theme_select = this._el.find("#theme_select").first();
             $(this.theme_select).val(this._config.theme);
             this.theme_select.on('change', this.selectTheme.bind(this));
@@ -480,16 +480,15 @@ define([
 
         // KEY MAP SELECTION
         if (this._config.enableKeybindingSelection) {
-            this._selectors.append( KeybindingSelectorHtml );
+            this._controls.append( KeybindingSelectorHtml );
             this.kb_select = this._el.find("#kb_select").first();
             $(this.kb_select).val(this._config.keyBinding);
             this.kb_select.on('change', this.selectKeyBinding.bind(this));
         }
 
-        this._toggles = $(this._el).find('#codeEditorToggles').first();
         // LINE WRAPPING TOGGLE
         if (this._config.enableLineWrappingToggle) {
-            this._toggles.append( LineWrappingToggleHtml );
+            this._controls.append( LineWrappingToggleHtml );
             this.lineWrap_toggle = this._el.find("#cbLineWrapping").first();
             $(this.lineWrap_toggle).prop('checked', this._config.lineWrapping);
             

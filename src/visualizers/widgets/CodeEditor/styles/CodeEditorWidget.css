@@ -85,30 +85,42 @@ div.code-editor-dialog .codeeditor-footer {
 #codeEditorLeft, #codeEditorRight {
     float:left;
     height:100%;
+    padding: 0;
+    display:flex;
+    flex-direction: column;
 }
 
 #codeEditorControls {
-    height: 85px;
-    overflow: auto;
+    height: auto;
+    display: table;
+    padding: 5px;
 }
 
 .codeEditorToggle {
     padding: 5px;
+    display: table-row;
 }
-
+.codeEditorToggle span {
+    display: table-cell;
+}
 .codeEditorToggle input {
-    float: right;
+    display: table-cell;
 }
 
 .codeEditorSelector {
     padding: 5px;
+    display: table-row;
 }
 .codeEditorSelector select {
-    float: right;
+    display: table-cell;
+    width: 100%;
+}
+.codeEditorSelector span {
+    display: table-cell;
 }
 
 #codeEditorScroll {
-    height: calc(100% - 85px);
+    flex: 1;
     overflow: auto;
     border-style: solid;
     border-color: lightgrey;
