@@ -264,8 +264,7 @@ define([
     'use strict';
 
     var CodeEditorWidget,
-        WIDGET_CLASS = 'code-editor',
-        cmPercent = '100%';
+        WIDGET_CLASS = 'code-editor';
 
     CodeEditorWidget = function (logger, container, client) {
         this._logger = logger.fork('Widget');
@@ -359,7 +358,6 @@ define([
         this._fullscreen = false;
         this._el.append(CodeEditorHtml);
 
-        this._contentDiv = this._el.find('.codeeditor-content');
         this._saveBtn = this._el.find('.btn-save');
         this._cancelBtn = this._el.find('.btn-cancel');
         this._compareBtn = this._el.find('.btn-compare');
@@ -495,10 +493,6 @@ define([
             this.lineWrap_toggle.on('click', this.toggleLineWrapping.bind(this));
         }
 
-        $(this._el).find('.CodeMirror').css({
-            height: cmPercent
-        });
-
         this._attachClientEventListeners();
     };
 
@@ -523,16 +517,10 @@ define([
             self._saveBtn.hide();
             self._compareBtn.hide();
             self._cancelBtn.hide();
-            $(self._compareEl).css({
-                height: '100%'
-            });
         } else {
             self._saveBtn.show();
             self._compareBtn.show();
             self._cancelBtn.show();
-            $(self._compareEl).css({
-                height: 'calc(100% - 51px)'
-            });
         }
     };
 
@@ -620,9 +608,6 @@ define([
             //$(container).zIndex(9999);
             $(container).css('zIndex',9999);
             $(container).prependTo(document.body);
-            $(container).find('.CodeMirror').css({
-                height: cmPercent
-            });
             //this.editor.focus();
             this._fullScreen = true;
         }
@@ -638,9 +623,6 @@ define([
             //$(container).zIndex('auto');
             $(container).css('zIndex','auto');
             $(container).appendTo(this._el);
-            $(container).find('.CodeMirror').css({
-                height: cmPercent
-            });
             //this.editor.focus();
             this._fullScreen = false;
         }
@@ -941,9 +923,6 @@ define([
             this._saveBtn.hide();
             this._compareBtn.hide();
             this._cancelBtn.hide();
-            $(this._compareEl).css({
-                height: '100%'
-            });
             this.editor.refresh();
             cmEditor.refresh();
             /*
@@ -1628,17 +1607,6 @@ define([
         this.clearNodes();
         this.shutdown();
     };
-
-    /*
-
-    CodeEditorWidget.prototype.onSelectionChanged = function() {
-        //console.log('changed');
-    };
-
-    CodeEditorWidget.prototype.onUIActivity = function() {
-        //console.log('UI');
-    };
-    */
 
     CodeEditorWidget.prototype.onActivate = function () {
         this._attachClientEventListeners();
