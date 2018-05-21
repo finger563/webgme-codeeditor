@@ -1066,36 +1066,64 @@ define([
 
     // CODE EDITOR WIDGET    
 
-    CodeEditorWidget.prototype.setGMESelection = function(nodeId, attrName) {
+    CodeEditorWidget.prototype.attributeToTab = function(nodeId, attrName) {
         var self = this;
-        var selId = nodeId;
-        var tabId = -1;
-        
-        if (!selId) {
-            var selectedTreeNodes = self._fancyTree.getSelectedNodes();
-            if (selectedTreeNodes.length) {
-                var selNode = selectedTreeNodes[0]; // should just be one
-                if (selNode.isFolder()) { // not a code attribute but an actual webGME node
-                    selId = selNode.data.id;
-                }
-                else { // code attribute, need to get parent for real webGME node
-                    selId = selNode.getParent().data.id;
-                    tabId = selNode.getIndex();
-                }
-                WebGMEGlobal.State.registerActiveSelection([selId], {invoker: self});
-                WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
-                WebGMEGlobal.State.registerActiveObject(
-                    selId,
-                    {suppressVisualizerFromNode: true}
-                );
+        var node = self.nodes[ nodeId ];
+        var codeAttributes = node && Object.keys(node.codeAttributes).sort();
+        return codeAttributes && codeAttributes.indexOf( attrName );
+    };
+
+    CodeEditorWidget.prototype.tabToAttribute = function(nodeId, tabId) {
+        var self = this;
+        var node = self.nodes[ nodeId ];
+        var codeAttributes = node && Object.keys(node.codeAttributes).sort();
+        return codeAttributes && codeAttributes[ tabId ];
+    };
+
+    CodeEditorWidget.prototype.getDefaultAttribute = function(nodeId) {
+        var self = this;
+        var node = self.nodes[ nodeId ];
+        return node && node.type && self._config.defaultAttributeMap[ node.type ];
+    };
+
+    CodeEditorWidget.prototype.getDefaultTab = function(nodeId) {
+        var self = this;
+        var node = self.nodes[ nodeId ];
+        var codeAttributes = node && Object.keys(node.codeAttributes).sort();
+        var index = codeAttributes && codeAttributes.indexOf( self.getDefaultAttribute( nodeId ));
+        return (index > -1) ? index : null;
+    };
+
+    CodeEditorWidget.prototype.getTreeSelection = function() {
+        var self = this;
+        var selection = {};
+        var selectedTreeNodes = self._fancyTree.getSelectedNodes();
+        if (selectedTreeNodes.length) {
+            var selId = null,
+                tabId = -1,
+                selNode = selectedTreeNodes[0]; // should just be one
+            if (selNode.isFolder()) { // not a code attribute but an actual webGME node
+                selId = selNode.data.id;
             }
-        } else {
-            var node = self.nodes[ selId ];
-            var codeAttributes = Object.keys(node.codeAttributes).sort();
-            var attr = attrName || self._config.defaultAttributeMap[ node.type ];
-            tabId = codeAttributes.indexOf(attr);
-            WebGMEGlobal.State.registerActiveSelection([selId]);
-            WebGMEGlobal.State.registerActiveTab(tabId);
+            else { // code attribute, need to get parent for real webGME node
+                selId = selNode.getParent().data.id;
+                tabId = selNode.getIndex();
+            }
+            selection.nodeId = selId;
+            selection.tabId = tabId;
+        }
+        return selection;
+    };
+
+    CodeEditorWidget.prototype.setGMESelection = function(nodeId, tabId) {
+        var self = this;
+        if (nodeId && tabId) {
+            WebGMEGlobal.State.registerActiveObject(
+                nodeId,
+                {suppressVisualizerFromNode: true}
+            );
+            WebGMEGlobal.State.registerActiveSelection([nodeId], {invoker: self});
+            WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
         }
     };
 
@@ -1297,15 +1325,18 @@ define([
 
     CodeEditorWidget.prototype.setActiveSelection = function(gmeId, tabId, fromWebGME) {
         var self = this;
+        if (!gmeId) {
+            return;
+        }
         self.setFromWebGME = fromWebGME;
-        if (self.nodes && self.nodes[ gmeId ]) {
-            var type = self.nodes[ gmeId ].type;
-            var selectedAttributeId = (tabId > -1) ? tabId : WebGMEGlobal.State.getActiveTab();
-            var codeAttributes = Object.keys(self.nodes[ gmeId ].codeAttributes).sort();
-            var selectedAttribute = selectedAttributeId && codeAttributes[ selectedAttributeId ];
-            var defaultAttr = selectedAttribute || self._config.defaultAttributeMap[ type ];
-            var key = gmeId + ( defaultAttr ? '::' + defaultAttr : '' );
-            self._fancyTree.activateKey( key );
+        var tabId = (tabId > -1) ? tabId : WebGMEGlobal.State.getActiveTab();
+        var selectedAttr = (tabId > -1) ? self.tabToAttribute(gmeId, tabId) : null;
+        var defaultAttr = self.getDefaultAttribute(gmeId);
+        var attr = selectedAttr || defaultAttr;
+        var key = gmeId + ( attr ? '::' + attr : '' );
+        self._fancyTree.activateKey( key );
+        if (self.setFromWebGME) {
+            self._fancyTree.reactivate();
         }
     };
 
@@ -1465,7 +1496,8 @@ define([
             
             // since we were set from the tree - inform webgme that we
             // have a new selection
-            self.setGMESelection();
+            var treeSelection = self.getTreeSelection();
+            self.setGMESelection(treeSelection.nodeId, treeSelection.tabId);
         }
         
         if (attrName && gmeNode) {
@@ -1515,54 +1547,50 @@ define([
     CodeEditorWidget.prototype._stateActiveSelectionChanged = function(model, activeSelection, opts) {
         var self = this,
             selectedIDs = [],
-            len = activeSelection ? activeSelection.length : 0;
+            len = activeSelection ? activeSelection.length : 0,
+            gmeId = (len && activeSelection[0]) || null,
+            tabId = WebGMEGlobal.State.getActiveTab();
 
         if (opts.invoker !== self) {
             if (len == 1) {
                 // check our current state
                 if (this.hasDifferentValue() && confirm("You have unsaved changes, do you want to save them?\nOK to save\nCancel to revert")) {
                     this.save().then(() => {
-                        this.setActiveSelection(activeSelection[0],
-                                                WebGMEGlobal.State.getActiveTab(),
-                                                true);
+                        this.setActiveSelection(gmeId, tabId, true);
                     });
                 } else {
-                    this.setActiveSelection(activeSelection[0],
-                                            WebGMEGlobal.State.getActiveTab(),
-                                            true);
+                    this.setActiveSelection(gmeId, tabId, true);
                 }
             }
         }
     };
 
     CodeEditorWidget.prototype._branchChanged = function(args) {
+        var self = this,
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0],
+            tabId = WebGMEGlobal.State.getActiveTab();
         // update readonly state
-        this._readOnly = this._client.isReadOnly();
-        // redisplay
-        setTimeout(() => {
-            this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
-                                    WebGMEGlobal.State.getActiveTab(),
-                                    true);
-        }, 250);
-
-        this.branchChanged = false;
+        let oldRO = self._readOnly;
+        self._readOnly = self._client.isReadOnly();
+        if (oldRO != self._readOnly) {
+            self.setActiveSelection(gmeId, tabId, true);
+        }
+        self.branchChanged = false;
     };
 
     CodeEditorWidget.prototype._branchStatusChanged = function(args) {
+        var self = this,
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0],
+            tabId = WebGMEGlobal.State.getActiveTab();
         // update readonly state
-        let oldRO = this._readOnly;
-        this._readOnly = this._client.isReadOnly();
-        if (oldRO != this._readOnly) {
-            // redisplay
-            setTimeout(() => {
-                this.setActiveSelection(WebGMEGlobal.State.getActiveSelection()[0],
-                                        WebGMEGlobal.State.getActiveTab(),
-                                        true);
-            }, 500);
+        let oldRO = self._readOnly;
+        self._readOnly = self._client.isReadOnly();
+        if (oldRO != self._readOnly) {
+            self.setActiveSelection(gmeId, tabId, true);
         }
 
-        if (!this.branchChanged) {
-            this.branchChanged = true;
+        if (!self.branchChanged) {
+            self.branchChanged = true;
         }
     };
 
