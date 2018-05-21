@@ -1118,10 +1118,6 @@ define([
     CodeEditorWidget.prototype.setGMESelection = function(nodeId, tabId) {
         var self = this;
         if (nodeId && tabId) {
-            WebGMEGlobal.State.registerActiveObject(
-                nodeId,
-                {suppressVisualizerFromNode: true}
-            );
             WebGMEGlobal.State.registerActiveSelection([nodeId], {invoker: self});
             WebGMEGlobal.State.registerActiveTab(tabId, {invoker: self})
         }
