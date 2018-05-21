@@ -6,9 +6,11 @@
 
 define(['js/Constants',
         'js/Utils/GMEConcepts',
+        'js/Utils/SvgManager',
         'js/NodePropertyNames'
        ], function (CONSTANTS,
                     GMEConcepts,
+                    svgManager,
                     nodePropertyNames) {
 
            'use strict';
@@ -170,9 +172,13 @@ define(['js/Constants',
                    objDescriptor.childrenIds = nodeObj.getChildrenIds();
                    objDescriptor.childrenNum = objDescriptor.childrenIds.length;
                    objDescriptor.parentId = nodeObj.getParentId();
-                   var iconPath = nodeObj.getRegistry('TreeItemCollapsedIcon');
-                   if (iconPath)
-                       objDescriptor.iconPath = '/assets/DecoratorSVG/' + iconPath;
+                   var iconPath = svgManager.getSvgUri(nodeObj, 'SVGIcon') ||
+                       svgManager.getSvgUri(nodeObj, 'TreeItemCollapsedIcon') ||
+                       svgManager.getSvgUri(nodeObj, 'TreeItemExpandedIcon') ||
+                       svgManager.getSvgUri(nodeObj, 'PortSVGIcon');
+                   if (iconPath) {
+                       objDescriptor.iconPath = iconPath;
+                   }
                    objDescriptor.isConnection = GMEConcepts.isConnection(nodeId);  // GMEConcepts can be helpful
 
                    if (self._config.rootTypes.indexOf(objDescriptor.type) == -1) {
