@@ -6,6 +6,8 @@
 [![npm](https://img.shields.io/npm/dm/webgme-codeeditor.svg)](https://www.npmjs.com/package/webgme-codeeditor)
 [![npm](https://img.shields.io/npm/dt/webgme-codeeditor.svg)](https://www.npmjs.com/package/webgme-codeeditor)
 
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/finger563)
+
 The WebGME CodeEditor is a multi-line text editor component for the
 WebGME collaborative web-based modeling environment
 [WebGME](https://webgme.org),
