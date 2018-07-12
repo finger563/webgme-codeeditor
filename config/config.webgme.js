@@ -7,6 +7,10 @@ var config = require('webgme/config/config.default'),
     validateConfig = require('webgme/config/validator');
 
 
+// Authentication
+config.authentication.enable = true;
+config.authentication.allowGuests = true;
+
 // The paths can be loaded from the webgme-setup.json
 
 
