@@ -129,7 +129,7 @@ div.code-editor-dialog .codeeditor-header {
     border-width: 1px;
 }
 
-details {
+.code-editor-details {
     border: 1px solid #E1E1E1;
     border-radius: 5px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, .4);
@@ -138,9 +138,9 @@ details {
     padding: 1%;
 }
 
-details[open] {background: #E1E1E1;}
+.code-editor-details[open] {background: #E1E1E1;}
 
-summary {
+.code-editor-summary {
     border-radius: 5px;
     cursor: pointer;
     font-size: 1.3em;
@@ -151,13 +151,14 @@ summary {
     width: 100%;
 }
 
-summary:hover, details[open] summary {
+.code-editor-summary:hover,
+.code-editor-details[open] summary {
     background: #E1E1E1;
 }
 
-summary::-webkit-details-marker {display: none}
+.code-editor-summary::-webkit-details-marker {display: none}
 
-summary:before {
+.code-editor-summary:before {
     border-radius: 5px;
     content: "+";
     color: #363636;
@@ -171,6 +172,6 @@ summary:before {
     width: 20px;
 }
 
-details[open] summary:before {
+.code-editor-details[open] summary:before {
     content: "-";
 }
