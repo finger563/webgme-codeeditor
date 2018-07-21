@@ -1302,9 +1302,16 @@ define([
                     'icon': mode.icon || 'glyphicon glyphicon-edit'
                 });
             });
-            if (WebGMEGlobal.State.getActiveSelection().indexOf(desc.id) > -1) {
-                // activate the node
-                self.setActiveSelection( desc.id );
+            if (WebGMEGlobal.State.getActiveSelection().length) {
+                if (WebGMEGlobal.State.getActiveSelection().indexOf(desc.id) > -1) {
+                    // activate the node
+                    self.setActiveSelection( desc.id );
+                }
+            } else if (WebGMEGlobal.State.getActiveObject()) {
+                if (WebGMEGlobal.State.getActiveObject() === desc.id) {
+                    // activate the node
+                    self.setActiveSelection( desc.id );
+                }
             }
             //self.editor.refresh();
             self._fancyTree.getRootNode().sortChildren(
@@ -1478,7 +1485,7 @@ define([
         if (self.setFromWebGME) {
             self.setFromWebGME = false;
             // get the id / node / attr from tab and selection
-            gmeId = WebGMEGlobal.State.getActiveSelection()[0];
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0] || WebGMEGlobal.State.getActiveObject();
             gmeNode = self.nodes[gmeId];
             var codeAttributes = Object.keys(gmeNode.codeAttributes).sort();
             attrName = codeAttributes[WebGMEGlobal.State.getActiveTab()];
@@ -1520,7 +1527,7 @@ define([
 
     CodeEditorWidget.prototype._stateActiveTabChanged = function(model, tabId, opts) {
         let self = this,
-            gmeId = WebGMEGlobal.State.getActiveSelection()[0];
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0] || WebGMEGlobal.State.getActiveObject();
 
         if (opts.invoker !== this) {
             // check our current state
@@ -1557,13 +1564,16 @@ define([
                 } else {
                     this.setActiveSelection(gmeId, tabId, true);
                 }
+            } else {
+                gmeId = WebGMEGlobal.State.getActiveObject();
+                this.setActiveSelection(gmeId, -1, true);
             }
         }
     };
 
     CodeEditorWidget.prototype._branchChanged = function(args) {
         var self = this,
-            gmeId = WebGMEGlobal.State.getActiveSelection()[0],
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0] || WebGMEGlobal.State.getActiveObject(),
             tabId = WebGMEGlobal.State.getActiveTab();
         // update readonly state
         let oldRO = self._readOnly;
@@ -1576,7 +1586,7 @@ define([
 
     CodeEditorWidget.prototype._branchStatusChanged = function(args) {
         var self = this,
-            gmeId = WebGMEGlobal.State.getActiveSelection()[0],
+            gmeId = WebGMEGlobal.State.getActiveSelection()[0] || WebGMEGlobal.State.getActiveObject(),
             tabId = WebGMEGlobal.State.getActiveTab();
         // update readonly state
         let oldRO = self._readOnly;
