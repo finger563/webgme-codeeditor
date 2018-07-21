@@ -506,7 +506,7 @@ define([
     }
 
     function makeDocSummary(docStr, summary) {
-        return '<details><summary>' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
+        return '<details class="code-editor-details"><summary class="code-editor-summary">' + summary + '</summary><p>\n' + docStr + '\n</p></details>';
     }
 
     CodeEditorWidget.prototype.updateDisplay = function() {
