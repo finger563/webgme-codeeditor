@@ -32,7 +32,7 @@
     "webgme": "^2.0.0"
   },
   "devDependencies": {
-    "mocha": "^2.2.5",
+    "mocha": "^10.1.0",
     "rimraf": "^2.4.0",
     "chai": "^3.0.0"
   },
